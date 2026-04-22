@@ -1,15 +1,15 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server/server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["dist/**", "server/**"]
-      }
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "dist/**",
+      "memory": 512,
+      "maxDuration": 10
     }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "server/server.js" }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/admin", "destination": "/api/index" },
+    { "source": "/(.*)", "destination": "/api/index" }
   ]
 }
