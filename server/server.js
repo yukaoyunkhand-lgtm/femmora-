@@ -14,14 +14,19 @@ app.use(express.json({ strict: false }));
 // Frontend статик файлуудыг serve хийх
 app.use(express.static(path.join(ROOT, 'dist')));
 
-// API routes
-app.use('/api/orders',    require('./routes/orders'));
-app.use('/api/qpay',      require('./routes/qpay'));
-app.use('/api/admin',     require('./routes/admin'));
-app.use('/api/my-orders', require('./routes/myorders'));
+// API routes — алдаа барьж сервер унахаас сэргийлнэ
+try {
+  app.use('/api/orders',    require('./routes/orders'));
+  app.use('/api/qpay',      require('./routes/qpay'));
+  app.use('/api/admin',     require('./routes/admin'));
+  app.use('/api/my-orders', require('./routes/myorders'));
+} catch (e) {
+  console.error('Route load error:', e.message);
+  app.use('/api', (_, res) => res.status(500).json({ error: e.message }));
+}
 
 // Health check
-app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date() }));
+app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date(), env: !!process.env.FIREBASE_SERVICE_ACCOUNT }));
 
 // Admin fallback
 app.get('/admin', (_, res) => res.sendFile(path.join(ROOT, 'dist/admin/index.html')));
