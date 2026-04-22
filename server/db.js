@@ -3,19 +3,22 @@ const path = require('path');
 const fs = require('fs');
 
 if (!admin.apps.length) {
-  const keyPath = path.join(__dirname, 'serviceAccountKey.json');
+  let credential;
 
-  if (fs.existsSync(keyPath)) {
-    const serviceAccount = require(keyPath);
-    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    // Vercel / Railway: env variable-д JSON string байна
+    const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    credential = admin.credential.cert(sa);
   } else {
-    // Railway / env-д credential байвал тэрийг ашиглана
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-      projectId: process.env.FIREBASE_PROJECT_ID || 'femmoramn',
-    });
+    // Локал: serviceAccountKey.json файл
+    const keyPath = path.join(__dirname, 'serviceAccountKey.json');
+    if (!fs.existsSync(keyPath)) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT env эсвэл server/serviceAccountKey.json байхгүй байна');
+    }
+    credential = admin.credential.cert(require(keyPath));
   }
+
+  admin.initializeApp({ credential, projectId: 'femmoramn' });
 }
 
-const db = admin.firestore();
-module.exports = db;
+module.exports = admin.firestore();

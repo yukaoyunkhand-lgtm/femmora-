@@ -7,3 +7,5 @@ server/serviceAccountKey.json
 .DS_Store
 Thumbs.db
 .claude/
+
+.vercel
