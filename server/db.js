@@ -7,7 +7,10 @@ if (!admin.apps.length) {
 
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     // Vercel / Railway: env variable-д JSON string байна
-    const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    let saJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+    // Зарим системд private_key дотрх \n escaped байдаг — засна
+    const sa = JSON.parse(saJson);
+    if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, '\n');
     credential = admin.credential.cert(sa);
   } else {
     // Локал: serviceAccountKey.json файл
