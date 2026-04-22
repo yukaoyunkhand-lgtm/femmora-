@@ -5,6 +5,7 @@ const { createInvoice } = require('./qpay');
 
 const PRICE_EXCL = 61110;
 const PRICE_INCL = 67900;
+const COL = 'orders';
 
 function genOrderNo() {
   const d = new Date();
@@ -13,23 +14,20 @@ function genOrderNo() {
   return `FM${ymd}${rand}`;
 }
 
-// POST /api/orders — шинэ захиалга
+// POST /api/orders
 router.post('/', async (req, res) => {
   const { name, phone, address, quantity = 1, include_vat = false } = req.body;
 
-  if (!name || !phone || !address) {
+  if (!name || !phone || !address)
     return res.status(400).json({ error: 'Нэр, утас, хаяг заавал шаардлагатай' });
-  }
-  if (!/^[0-9]{8}$/.test(phone)) {
+  if (!/^[0-9]{8}$/.test(phone))
     return res.status(400).json({ error: 'Утасны дугаар 8 оронтой байх ёстой' });
-  }
 
   const unitPrice = include_vat ? PRICE_INCL : PRICE_EXCL;
   const amount = unitPrice * Number(quantity);
   const order_no = genOrderNo();
 
   const order = {
-    id: Date.now(),
     order_no,
     name,
     phone,
@@ -38,62 +36,49 @@ router.post('/', async (req, res) => {
     include_vat: !!include_vat,
     amount,
     status: 'pending',
+    uid: req.body.uid || null,
     qpay_invoice_id: null,
     qpay_qr_text: null,
     created_at: new Date().toISOString(),
     paid_at: null,
   };
 
-  db.get('orders').push(order).write();
+  await db.collection(COL).doc(order_no).set(order);
 
   try {
     const qpay = await createInvoice({ order_no, amount, name });
-    db.get('orders').find({ order_no }).assign({
+    await db.collection(COL).doc(order_no).update({
       qpay_invoice_id: qpay.invoice_id,
       qpay_qr_text: qpay.qr_text,
-    }).write();
-
-    res.json({
-      success: true,
-      order_no,
-      amount,
-      qpay: {
-        invoice_id: qpay.invoice_id,
-        qr_text: qpay.qr_text,
-        qr_image: qpay.qr_image,
-        urls: qpay.urls,
-      }
     });
+    res.json({ success: true, order_no, amount, qpay });
   } catch (err) {
     res.json({
-      success: true,
-      order_no,
-      amount,
-      qpay: null,
-      warning: 'QPay тохиргоо хийгдээгүй — захиалга хадгалагдлаа: ' + err.message,
+      success: true, order_no, amount, qpay: null,
+      warning: 'QPay тохиргоо хийгдээгүй: ' + err.message,
     });
   }
 });
 
-// GET /api/orders — бүх захиалга (admin)
-router.get('/', (req, res) => {
-  const orders = db.get('orders').value().slice().reverse();
-  res.json(orders);
+// GET /api/orders
+router.get('/', async (req, res) => {
+  const snap = await db.collection(COL).orderBy('created_at', 'desc').get();
+  res.json(snap.docs.map(d => d.data()));
 });
 
-// GET /api/orders/:order_no — нэг захиалга
-router.get('/:order_no', (req, res) => {
-  const order = db.get('orders').find({ order_no: req.params.order_no }).value();
-  if (!order) return res.status(404).json({ error: 'Захиалга олдсонгүй' });
-  res.json(order);
+// GET /api/orders/:order_no
+router.get('/:order_no', async (req, res) => {
+  const doc = await db.collection(COL).doc(req.params.order_no).get();
+  if (!doc.exists) return res.status(404).json({ error: 'Захиалга олдсонгүй' });
+  res.json(doc.data());
 });
 
 // PATCH /api/orders/:order_no/status
-router.patch('/:order_no/status', (req, res) => {
+router.patch('/:order_no/status', async (req, res) => {
   const { status } = req.body;
   const allowed = ['pending', 'paid', 'shipped', 'delivered', 'cancelled'];
   if (!allowed.includes(status)) return res.status(400).json({ error: 'Буруу статус' });
-  db.get('orders').find({ order_no: req.params.order_no }).assign({ status }).write();
+  await db.collection(COL).doc(req.params.order_no).update({ status });
   res.json({ success: true });
 });
 

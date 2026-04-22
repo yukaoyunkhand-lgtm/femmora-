@@ -10,15 +10,15 @@ const ROOT = path.join(__dirname, '..');
 
 app.use(cors());
 app.use(express.json({ strict: false }));
-app.use((req, res, next) => { res.setHeader('Content-Type', 'application/json; charset=utf-8'); next(); });
 
 // Frontend статик файлуудыг serve хийх
 app.use(express.static(path.join(ROOT, 'dist')));
 
 // API routes
-app.use('/api/orders', require('./routes/orders'));
-app.use('/api/qpay',   require('./routes/qpay'));
-app.use('/api/admin',  require('./routes/admin'));
+app.use('/api/orders',    require('./routes/orders'));
+app.use('/api/qpay',      require('./routes/qpay'));
+app.use('/api/admin',     require('./routes/admin'));
+app.use('/api/my-orders', require('./routes/myorders'));
 
 // Health check
 app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date() }));

@@ -1,6 +1,17 @@
 ﻿var isVat=false;
 var currentLang='mn';
 
+function toggleAuthMenu(){
+  var m=document.getElementById('authMenu');
+  m.style.display=m.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  var btn=document.getElementById('authBtn');
+  var menu=document.getElementById('authMenu');
+  if(menu&&btn&&!btn.contains(e.target)&&!menu.contains(e.target))
+    menu.style.display='none';
+});
+
 // Захиалгын modal нээх
 function openOrderModal(){
   document.getElementById('orderModal').style.display='flex';
@@ -24,7 +35,8 @@ async function submitOrder(e){
     phone:document.getElementById('o_phone').value.trim(),
     address:document.getElementById('o_address').value.trim(),
     quantity:Number(document.getElementById('o_qty').value),
-    include_vat:isVat
+    include_vat:isVat,
+    uid:window._currentUid||null
   };
   var res=document.getElementById('orderResult');
   try{
@@ -37,6 +49,7 @@ async function submitOrder(e){
       res.innerHTML='<div class="or-success"><p class="or-no">Захиалга №'+json.order_no+' бүртгэгдлээ!</p><p>Бид тантай удахгүй холбоо барих болно.</p>'+(json.warning?'<p class="or-warn">'+json.warning+'</p>':'')+'</div>';
     }
     document.getElementById('orderForm').style.display='none';
+    if(typeof window._logOrder==='function') window._logOrder(json.order_no, json.amount);
   } catch(err){
     res.innerHTML='<p class="or-err">'+err.message+'</p>';
   } finally{
@@ -56,6 +69,7 @@ function showVat(v){
 }
 function setLang(l){
   currentLang=l;
+  if(typeof window._logLang==='function') window._logLang(l);
   document.querySelectorAll('.lb').forEach(function(b){b.classList.remove('active');});
   document.getElementById(l==='mn'?'bn':l==='ko'?'bk':'be').classList.add('active');
   document.querySelectorAll('.t').forEach(function(el){var v=el.getAttribute('data-'+l);if(v)el.innerHTML=v;});
