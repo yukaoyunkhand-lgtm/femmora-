@@ -2,26 +2,36 @@ const admin = require('firebase-admin');
 const path = require('path');
 const fs = require('fs');
 
-if (!admin.apps.length) {
-  let credential;
+let _db = null;
 
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    // Vercel / Railway: env variable-д JSON string байна
-    let saJson = process.env.FIREBASE_SERVICE_ACCOUNT;
-    // Зарим системд private_key дотрх \n escaped байдаг — засна
-    const sa = JSON.parse(saJson);
-    if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, '\n');
-    credential = admin.credential.cert(sa);
-  } else {
-    // Локал: serviceAccountKey.json файл
-    const keyPath = path.join(__dirname, 'serviceAccountKey.json');
-    if (!fs.existsSync(keyPath)) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT env эсвэл server/serviceAccountKey.json байхгүй байна');
+function getDb() {
+  if (_db) return _db;
+
+  if (!admin.apps.length) {
+    let credential;
+
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, '\n');
+      credential = admin.credential.cert(sa);
+    } else {
+      const keyPath = path.join(__dirname, 'serviceAccountKey.json');
+      if (!fs.existsSync(keyPath)) throw new Error('Firebase credentials олдсонгүй');
+      credential = admin.credential.cert(require(keyPath));
     }
-    credential = admin.credential.cert(require(keyPath));
+
+    admin.initializeApp({ credential, projectId: 'femmoramn' });
   }
 
-  admin.initializeApp({ credential, projectId: 'femmoramn' });
+  _db = admin.firestore();
+  return _db;
 }
 
-module.exports = admin.firestore();
+// Proxy: db.collection(...) автоматаар getDb() дуудна
+module.exports = new Proxy({}, {
+  get(_, prop) {
+    const db = getDb();
+    const val = db[prop];
+    return typeof val === 'function' ? val.bind(db) : val;
+  }
+});
