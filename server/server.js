@@ -31,6 +31,11 @@ app.get('*', (_, res) => {
   res.sendFile(path.join(ROOT, 'dist/index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Femmora сервер ажиллаж байна: http://localhost:${PORT}`);
-});
+// Локал дээр сервер эхлүүлэх, Vercel дээр export хийх
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Femmora сервер ажиллаж байна: http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
