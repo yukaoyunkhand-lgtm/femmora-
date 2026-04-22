@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>femmora — Silver Edition Semi-Matte Air Cushion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="lb-bar">
+  <button class="lb active" id="bn" onclick="setLang('mn')">MN</button>
+  <button class="lb" id="bk" onclick="setLang('ko')">KO</button>
+  <button class="lb" id="be" onclick="setLang('en')">EN</button>
+</div>
+<nav>
+  <img class="logo" src="images/img_01.png" alt="femmora">
+  <ul class="nl">
+    <li><a href="#ab"><span class="t" data-mn="Бидний тухай" data-ko="브랜드" data-en="About">Бидний тухай</span></a></li>
+    <li><a href="#pr"><span class="t" data-mn="Бүтээгдэхүүн" data-ko="제품" data-en="Product">Бүтээгдэхүүн</span></a></li>
+    <li><a href="#in"><span class="t" data-mn="Найрлага" data-ko="성분" data-en="Ingredients">Найрлага</span></a></li>
+    <li><a href="#buy"><span class="t" data-mn="Худалдан авах" data-ko="구매" data-en="Shop">Худалдан авах</span></a></li>
+  </ul>
+  <div class="nr"><span class="ni">♡</span><span class="ni">⊡</span></div>
+</nav>
+<section class="hero">
+  <div class="hi">
+    <img src="images/img_02.jpg" alt="femmora">
+    <div class="spf"><div class="spfn">SPF50+</div><div class="spft">PA++++</div></div>
+  </div>
+  <div class="ht">
+    <p class="ey">Silver Edition · 2025</p>
+    <h1><span class="t" data-mn="<em>Өөгүй</em> арьс,<br>өдөржин<br>гэрэлтэх төрх" data-ko="<em>완벽한</em> 피부,<br>하루종일<br>빛나는 얼굴" data-en="<em>Flawless</em> skin,<br>radiant glow<br>all day long"><em>Өөгүй</em> арьс,<br>өдөржин<br>гэрэлтэх төрх</span></h1>
+    <p class="tl t" data-mn="simple. perfect." data-ko="심플. 퍼펙트." data-en="simple. perfect.">simple. perfect.</p>
+    <div class="divl"></div>
+    <p class="hs t" data-mn="Арьс арчилгаа, нарны хамгаалалт, нүүр будалтын төгс нэгдэл — таны өдөр бүрийн цорын ганц сонголт." data-ko="스킨케어, 자외선 차단, 메이크업의 완벽한 조화 — 매일을 위한 단 하나의 선택." data-en="The perfect fusion of skincare, sun protection, and makeup — your one essential every day.">Арьс арчилгаа, нарны хамгаалалт, нүүр будалтын төгс нэгдэл — таны өдөр бүрийн цорын ганц сонголт.</p>
+    <div class="br">
+      <button class="bd" onclick="document.getElementById('buy').scrollIntoView()"><span class="t" data-mn="Худалдан авах" data-ko="지금 구매" data-en="Shop Now">Худалдан авах</span></button>
+      <button class="bo" onclick="document.getElementById('pr').scrollIntoView()"><span class="t" data-mn="Дэлгэрэнгүй" data-ko="자세히" data-en="Learn More">Дэлгэрэнгүй</span></button>
+    </div>
+  </div>
+</section>
+<div class="ticker"><div class="tt">
+  <span class="tk">Semi-Matte Finish &nbsp;·&nbsp; </span><span class="tk">SPF50+ PA++++ &nbsp;·&nbsp; </span><span class="tk">3-in-1 Hybrid &nbsp;·&nbsp; </span><span class="tk">8-Layer Hyaluronic Acid &nbsp;·&nbsp; </span><span class="tk">Sebum Control &nbsp;·&nbsp; </span><span class="tk">Skin Blur Effect &nbsp;·&nbsp; </span><span class="tk">Rubycell Technology &nbsp;·&nbsp; </span><span class="tk">Clean Beauty &nbsp;·&nbsp; </span>
+  <span class="tk">Semi-Matte Finish &nbsp;·&nbsp; </span><span class="tk">SPF50+ PA++++ &nbsp;·&nbsp; </span><span class="tk">3-in-1 Hybrid &nbsp;·&nbsp; </span><span class="tk">8-Layer Hyaluronic Acid &nbsp;·&nbsp; </span><span class="tk">Sebum Control &nbsp;·&nbsp; </span><span class="tk">Skin Blur Effect &nbsp;·&nbsp; </span><span class="tk">Rubycell Technology &nbsp;·&nbsp; </span><span class="tk">Clean Beauty &nbsp;·&nbsp; </span>
+</div></div>
+
+<section class="price-sec" id="buy">
+  <div class="price-top">
+    <p style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.6rem;font-weight:400" class="t" data-mn="Худалдан авах" data-ko="구매하기" data-en="Purchase">Худалдан авах</p>
+    <p style="font-size:22px;font-weight:200;color:var(--sp);letter-spacing:-.5px">Silver Edition Semi-Matte Air Cushion</p>
+  </div>
+  <div class="price-toggle">
+    <button class="pt-btn active" id="novatBtn" onclick="showVat(false)"><span class="t" data-mn="НӨЭТ-гүй" data-ko="부가세 제외" data-en="Excl. VAT">НӨЭТ-гүй</span></button>
+    <button class="pt-btn" id="vatBtn" onclick="showVat(true)"><span class="t" data-mn="НӨЭТ-тэй" data-ko="부가세 포함" data-en="Incl. VAT">НӨЭТ-тэй</span></button>
+  </div>
+  <div class="price-inner">
+    <div class="price-col">
+      <p class="price-label t" data-mn="Үнэ" data-ko="가격" data-en="Price">Үнэ</p>
+      <p class="price-amount" id="priceDisplay">61,110₮</p>
+      <p class="price-note" id="priceNote">НӨЭТ-гүй үнэ</p>
+    </div>
+    <div class="price-divider"></div>
+    <div class="price-col">
+      <p style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:1.2rem;font-weight:300;letter-spacing:.5px" class="t" data-mn="QPay-р шуурхай төлөх" data-ko="QPay로 빠르게 결제" data-en="Pay instantly with QPay">QPay-р шуурхай төлөх</p>
+      <a href="#" onclick="openOrderModal();return false;" class="qpay-btn">
+        <div class="qpay-icon">
+          <svg width="12" height="12" viewBox="0 0 24 24" style="fill:var(--sp)"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="4" height="4" rx="1"/><rect x="19" y="13" width="2" height="2"/><rect x="13" y="19" width="2" height="2"/><rect x="17" y="17" width="4" height="4" rx="1"/></svg>
+        </div>
+        <span class="t" data-mn="QPay төлбөр хийх" data-ko="QPay 결제하기" data-en="Pay with QPay">QPay төлбөр хийх</span>
+      </a>
+      <p style="font-size:9px;color:rgba(255,255,255,.25);margin-top:.9rem;letter-spacing:1px;font-weight:300" class="t" data-mn="Аюулгүй · Шуурхай · Найдвартай" data-ko="안전 · 빠른 · 신뢰할 수 있는" data-en="Secure · Fast · Reliable">Аюулгүй · Шуурхай · Найдвартай</p>
+    </div>
+  </div>
+</section>
+
+<section class="editorial sec" id="ab">
+  <div class="eh"><div>
+    <p class="sl t" data-mn="Кампэйн" data-ko="캠페인" data-en="Campaign">Кампэйн</p>
+    <h2 class="t" data-mn="Silver Edition <em>Look Book</em>" data-ko="실버 에디션 <em>룩북</em>" data-en="Silver Edition <em>Look Book</em>">Silver Edition <em>Look Book</em></h2>
+  </div></div>
+  <div class="eg">
+    <div class="ec"><img src="images/img_03.jpg" alt=""><div class="ecap"><p class="ect t" data-mn="Feminine Aura" data-ko="페미닌 오라" data-en="Feminine Aura">Feminine Aura</p></div></div>
+    <div class="ec tall"><img src="images/img_04.jpg" alt=""><div class="ecap"><p class="ect t" data-mn="Silver Edition" data-ko="실버 에디션" data-en="Silver Edition">Silver Edition</p></div></div>
+    <div class="ec"><img src="images/img_05.jpg" alt=""><div class="ecap"><p class="ect t" data-mn="simple. perfect." data-ko="심플. 퍼펙트." data-en="simple. perfect.">simple. perfect.</p></div></div>
+    <div class="ec"><img src="images/img_06.jpg" alt=""><div class="ecap"><p class="ect t" data-mn="Өдөржин гэрэлтэх" data-ko="하루종일 빛나다" data-en="Glow all day">Өдөржин гэрэлтэх</p></div></div>
+    <div class="ec"><img src="images/img_07.jpg" alt=""><div class="ecap"><p class="ect t" data-mn="Дотоодоос гэрэлтэх" data-ko="내면에서 빛나다" data-en="Radiance from within">Дотоодоос гэрэлтэх</p></div></div>
+  </div>
+</section>
+<section class="about sec">
+  <div class="ai"><img src="images/img_08.jpg" alt="femmora brand"></div>
+  <div>
+    <p class="sl t" data-mn="Брэндийн тухай" data-ko="브랜드 소개" data-en="Brand Story">Брэндийн тухай</p>
+    <h2 class="t" data-mn="Feminine <em>Aura</em> —<br>дотоодоос<br>гэрэлтэх" data-ko="Feminine <em>Aura</em> —<br>내면에서<br>빛나다" data-en="Feminine <em>Aura</em> —<br>radiance<br>from within">Feminine <em>Aura</em> —<br>дотоодоос<br>гэрэлтэх</h2>
+    <p style="font-size:12px;line-height:1.9;color:var(--md);font-weight:300;margin-top:1rem;margin-bottom:2rem;max-width:400px" class="t" data-mn="Бид арьсыг 'далдлах' бус, түүнийг 'хайрлах' философийг баримталдаг. Дотоод гэрлээ гадагш тусгахыг бид уриалж байна." data-ko="우리는 피부를 '숨기는' 것이 아닌 '사랑하는' 철학을 추구합니다." data-en="We follow a philosophy of loving skin, not hiding it.">Бид арьсыг 'далдлах' бус, түүнийг 'хайрлах' философийг баримталдаг.</p>
+    <div class="pi"><p class="pil t" data-mn="Алсын харагдац" data-ko="비전" data-en="Vision">Алсын харагдац</p><p class="pit t" data-mn="Байгалийн өгөгдлийг тодотгох цэвэр найрлага — таны жинхэнэ гоо үзэсгэлэнг илрүүлэх." data-ko="자연을 강조하는 순수한 성분 — 진정한 아름다움을 드러내는." data-en="Pure formulas that enhance nature — revealing your true beauty.">Байгалийн өгөгдлийг тодотгох цэвэр найрлага — таны жинхэнэ гоо үзэсгэлэнг илрүүлэх.</p></div>
+    <div class="pi"><p class="pil t" data-mn="Өдөр тутмын заншил" data-ko="리추얼" data-en="Ritual">Өдөр тутмын заншил</p><p class="pit t" data-mn="Өдөр бүр хэрэглэхэд хялбар, үр дүнтэй шийдэл. Capsule &amp; Skin First систем." data-ko="매일 사용하기 쉽고 효과적인 솔루션." data-en="Easy and effective daily solutions. Capsule &amp; Skin First system.">Өдөр бүр хэрэглэхэд хялбар. Capsule &amp; Skin First систем.</p></div>
+    <div class="pi"><p class="pil t" data-mn="Зорилго" data-ko="목표" data-en="Goal">Зорилго</p><p class="pit t" data-mn="Өөрийнхөө хамгийн шилдэг хувилбарыг бүтээх." data-ko="자신의 최고 버전을 만드는 것." data-en="Creating the best version of yourself.">Өөрийнхөө хамгийн шилдэг хувилбарыг бүтээх.</p></div>
+  </div>
+</section>
+<section class="ps sec" id="pr">
+  <p class="sl t" data-mn="Бүтээгдэхүүн" data-ko="제품 소개" data-en="The Product">Бүтээгдэхүүн</p>
+  <h2 class="t" data-mn="Silver Edition <em>Semi-Matte</em> Air Cushion" data-ko="실버 에디션 <em>세미 매트</em> 에어 쿠션" data-en="Silver Edition <em>Semi-Matte</em> Air Cushion">Silver Edition <em>Semi-Matte</em> Air Cushion</h2>
+  <div class="pl2">
+    <div class="pp">
+      <div class="pph"><img src="images/img_09.jpg" alt=""></div>
+      <div class="pph"><img src="images/img_10.jpg" alt=""></div>
+      <div class="pph"><img src="images/img_11.jpg" alt=""></div>
+      <div class="pph"><img src="images/img_12.jpg" alt=""></div>
+    </div>
+    <div class="pf">
+      <div class="ft"><div class="fn">01</div><div><p class="fti t" data-mn="Semi-Matte финиш" data-ko="세미 매트 피니시" data-en="Semi-Matte Finish">Semi-Matte финиш</p><p class="fd t" data-mn="Хэт хуурай биш, хэт гялалзсан биш. Зөөлөн таатай мэдрэмжийг өдөржин хадгалах технологи." data-ko="너무 건조하지도, 너무 빛나지도 않는. 하루종일 편안함을 유지." data-en="Not too dry, not too glossy. Soft comfort all day.">Хэт хуурай биш, хэт гялалзсан биш. Зөөлөн таатай мэдрэмжийг өдөржин хадгалах технологи.</p></div></div>
+      <div class="ft"><div class="fn">02</div><div><p class="fti">Skin Blur Effect</p><p class="fd t" data-mn="Нүхжилт болон нарийн үрчлээг бүдгэрүүлж, арьсны өнгийг хормын дотор жигдлэнэ." data-ko="모공과 잔주름을 블러 처리하여 피부 톤을 균일하게." data-en="Blurs pores and fine lines, evens skin tone instantly.">Нүхжилт болон нарийн үрчлээг бүдгэрүүлж, арьсны өнгийг хормын дотор жигдлэнэ.</p></div></div>
+      <div class="ft"><div class="fn">03</div><div><p class="fti">Sebum Control</p><p class="fd t" data-mn="Илүүдэл тослогийг хянаж, шинэлэг төрхийг хадгална. Наалдамхай мэдрэмжгүй." data-ko="피지를 조절하고 신선함을 유지. 끈적임 없음." data-en="Controls sebum, maintains freshness. No sticky feeling.">Илүүдэл тослогийг хянаж, шинэлэг төрхийг хадгална. Наалдамхай мэдрэмжгүй.</p></div></div>
+      <div class="ft"><div class="fn">04</div><div><p class="fti t" data-mn="Rubycell порлон" data-ko="루비셀 퍼프" data-en="Rubycell Puff">Rubycell порлон</p><p class="fd t" data-mn="Бүтээгдэхүүнийг хамгийн хэмнэлттэйгээр нимгэн, нягт тарааж орчин үеийн шийдэл." data-ko="제품을 얇고 균일하게 펴 바르는 현대적인 솔루션." data-en="Modern solution spreading product thinly and evenly.">Бүтээгдэхүүнийг хамгийн хэмнэлттэйгээр нимгэн, нягт тарааж орчин үеийн шийдэл.</p></div></div>
+      <div class="ft"><div class="fn">05</div><div><p class="fti">SPF50+ PA++++</p><p class="fd t" data-mn="UVA болон UVB туяаны эсрэг дээд зэргийн хамгаалалт. Арьсыг залуугаар нь хадгална." data-ko="UVA와 UVB에 대한 최고 수준의 보호." data-en="Maximum protection against UVA &amp; UVB. Keeps skin youthful.">UVA болон UVB туяаны эсрэг дээд зэргийн хамгаалалт. Арьсыг залуугаар нь хадгална.</p></div></div>
+    </div>
+  </div>
+</section>
+<div class="strip">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end">
+    <div><p style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:.8rem;font-weight:400" class="t" data-mn="Гурвалсан шийдэл" data-ko="3가지 솔루션" data-en="Triple Solution">Гурвалсан шийдэл</p><h2 style="color:var(--sp)">3-in-1 <em>Hybrid Solution</em></h2></div>
+    <p style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.65);font-weight:400" class="t" data-mn="Нэг бүтээгдэхүүн · Гурван үйлдэл" data-ko="하나의 제품 · 세 가지 효과" data-en="One Product · Three Actions">Нэг бүтээгдэхүүн · Гурван үйлдэл</p>
+  </div>
+  <div class="sg">
+    <div class="si"><div class="sn">01</div><p class="stl t" data-mn="Арьс арчилгаа" data-ko="스킨케어" data-en="Skincare">Арьс арчилгаа</p><p class="stx t" data-mn="Цайруулах + Үрчлээний эсрэг. 8-Layer Hyaluronic Acid болон 11 төрлийн цэцгийн ханд." data-ko="미백 + 안티에이징. 8중 히알루론산과 11가지 꽃 추출물." data-en="Brightening + anti-aging. 8-Layer Hyaluronic Acid &amp; 11 flower extracts.">Цайруулах + Үрчлээний эсрэг. 8-Layer Hyaluronic Acid болон 11 төрлийн цэцгийн ханд.</p></div>
+    <div class="si"><div class="sn">02</div><p class="stl t" data-mn="Нарны хамгаалалт" data-ko="자외선 차단" data-en="Sun Protection">Нарны хамгаалалт</p><p class="stx t" data-mn="SPF50+ PA++++ — хамгийн өндөр түвшний хамгаалалт. UVA болон UVB туяаны эсрэг." data-ko="SPF50+ PA++++ — 최고 수준의 보호." data-en="SPF50+ PA++++ — highest level of UV protection.">SPF50+ PA++++ — хамгийн өндөр түвшний хамгаалалт.</p></div>
+    <div class="si"><div class="sn">03</div><p class="stl t" data-mn="Мэргэжлийн будалт" data-ko="프로 메이크업" data-en="Pro Makeup">Мэргэжлийн будалт</p><p class="stx t" data-mn="Skin Blur + Sebum Control хослолоор мэргэжлийн дүр төрх өдөржин хадгалагдана." data-ko="Skin Blur + Sebum Control로 전문적인 외모를 하루종일 유지." data-en="Skin Blur + Sebum Control maintains a professional look all day.">Skin Blur + Sebum Control хослолоор мэргэжлийн дүр төрх өдөржин хадгалагдана.</p></div>
+  </div>
+</div>
+<section class="ingr sec" id="in">
+  <p class="sl t" data-mn="Байгалийн хүч" data-ko="자연의 힘" data-en="Nature's Power">Байгалийн хүч</p>
+  <h2 class="t" data-mn="Гол <em>найрлага</em>" data-ko="핵심 <em>성분</em>" data-en="Key <em>Ingredients</em>">Гол <em>найрлага</em></h2>
+  <div class="ig">
+    <div class="ic"><div class="inum">01</div><p class="inm">8-Layer Hyaluronic Acid</p><p class="ins">Hyaluronic Acid Complex</p><p class="ind t" data-mn="Найман төрлийн гиалуроны хүчил нь арьсны бүх давхаргад чийг өгч, өдөржин уян хатан байлгана." data-ko="8가지 히알루론산이 피부의 모든 층에 수분을 공급하여 하루종일 탄력있게 유지합니다." data-en="Eight types of hyaluronic acid deliver moisture to every skin layer, keeping it supple all day.">Найман төрлийн гиалуроны хүчил нь арьсны бүх давхаргад чийг өгч, өдөржин уян хатан байлгана.</p></div>
+    <div class="ic"><div class="inum">02</div><p class="inm">Pink Bouquet Complex</p><p class="ins">11 Flower Extracts</p><p class="ind t" data-mn="11 төрлийн цэцгийн ханд нь арьсыг тайвшруулж, эрүүл гялалзсан, залуу харагдах эрч хүчийг өгнө." data-ko="11가지 꽃 추출물이 피부를 진정시키고 건강하게 빛나며 젊어 보이는 활력을 줍니다." data-en="11 flower extracts soothe skin and give it the vitality for a radiant, youthful appearance.">11 төрлийн цэцгийн ханд нь арьсыг тайвшруулж, эрүүл гялалзсан, залуу харагдах эрч хүчийг өгнө.</p></div>
+    <div class="ic"><div class="inum">03</div><p class="inm">Shield Protection</p><p class="ins">Environmental Defense Complex</p><p class="ind t" data-mn="Гадаад орчны бохирдол болон нарны туяанаас арьсыг тань давхар хамгаална." data-ko="외부 오염과 자외선으로부터 이중으로 보호합니다." data-en="Double protection against environmental pollution and UV rays all day.">Гадаад орчны бохирдол болон нарны туяанаас арьсыг тань давхар хамгаална.</p></div>
+  </div>
+</section>
+<section class="camp">
+  <div class="ch">
+    <p class="sl t" data-mn="Кампэйн галерей" data-ko="캠페인 갤러리" data-en="Gallery">Кампэйн галерей</p>
+    <h2 class="t" data-mn="<em>Зургийн</em> цуглуулга" data-ko="<em>사진</em> 컬렉션" data-en="<em>Photo</em> Collection"><em>Зургийн</em> цуглуулга</h2>
+  </div>
+  <div class="ci">
+    <div class="cim"><img src="images/img_13.jpg" alt=""></div><div class="cim"><img src="images/img_14.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_15.jpg" alt=""></div><div class="cim"><img src="images/img_16.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_17.jpg" alt=""></div><div class="cim"><img src="images/img_18.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_19.jpg" alt=""></div><div class="cim"><img src="images/img_20.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_21.jpg" alt=""></div><div class="cim"><img src="images/img_22.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_23.jpg" alt=""></div><div class="cim"><img src="images/img_24.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_25.jpg" alt=""></div><div class="cim"><img src="images/img_26.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_27.jpg" alt=""></div><div class="cim"><img src="images/img_28.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_29.jpg" alt=""></div><div class="cim"><img src="images/img_30.jpg" alt=""></div>
+    <div class="cim"><img src="images/img_31.jpg" alt=""></div><div class="cim"><img src="images/img_32.jpg" alt=""></div>
+  </div>
+</section>
+<footer>
+  <div>
+    <img class="fl" src="images/img_33.png" alt="femmora">
+    <p class="fta t" data-mn="Feminine Aura —<br>дотоодоос гэрэлтэх.<br>simple. perfect." data-ko="Feminine Aura —<br>내면에서 빛나다.<br>simple. perfect." data-en="Feminine Aura —<br>radiance from within.<br>simple. perfect.">Feminine Aura —<br>дотоодоос гэрэлтэх.<br>simple. perfect.</p>
+  </div>
+  <div>
+    <p class="ftl t" data-mn="Бүтээгдэхүүн" data-ko="제품" data-en="Products">Бүтээгдэхүүн</p>
+    <ul class="fls"><li><a href="#">Silver Edition Cushion</a></li><li><a href="#"><span class="t" data-mn="Серум" data-ko="세럼" data-en="Serum">Серум</span></a></li><li><a href="#"><span class="t" data-mn="Цуглуулга" data-ko="컬렉션" data-en="Collection">Цуглуулга</span></a></li></ul>
+  </div>
+  <div>
+    <p class="ftl t" data-mn="Мэдээлэл" data-ko="정보" data-en="Info">Мэдээлэл</p>
+    <ul class="fls"><li><a href="#ab"><span class="t" data-mn="Бидний тухай" data-ko="브랜드" data-en="About">Бидний тухай</span></a></li><li><a href="#in"><span class="t" data-mn="Найрлага" data-ko="성분" data-en="Ingredients">Найрлага</span></a></li><li><a href="#"><span class="t" data-mn="Блог" data-ko="블로그" data-en="Blog">Блог</span></a></li></ul>
+  </div>
+  <div>
+    <p class="ftl t" data-mn="Холбоо барих" data-ko="연락처" data-en="Contact">Холбоо барих</p>
+    <ul class="fls"><li><a href="https://www.instagram.com/femmora_beauty_brand">Instagram</a></li><li><a href="#">@femmora_beauty_brand</a></li><li><a href="tel:72887770">72887770</a></li><li><a href="mailto:info@femmorabeauties.com">info@femmorabeauties.com</a></li><li><a href="#buy"><span class="t" data-mn="QPay Захиалга" data-ko="QPay 주문" data-en="QPay Order">QPay Захиалга</span></a></li></ul>
+  </div>
+  <div class="fb">
+    <p class="fc">© 2025 femmora. All rights reserved.</p>
+    <p class="fc t" data-mn="simple. perfect." data-ko="심플. 퍼펙트." data-en="simple. perfect.">simple. perfect.</p>
+  </div>
+</footer>
+
+<!-- Захиалгын Modal -->
+<div id="orderModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(42,36,32,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#f9f5ee;max-width:480px;width:100%;padding:2.5rem;position:relative;max-height:90vh;overflow-y:auto">
+    <button onclick="closeOrderModal()" style="position:absolute;top:1rem;right:1.2rem;background:none;border:none;font-size:20px;cursor:pointer;color:#6b5f5a">✕</button>
+    <p style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:#c8c4c0;margin-bottom:.5rem;font-weight:400">Захиалга өгөх</p>
+    <h2 style="font-size:20px;font-weight:200;margin-bottom:1.8rem;letter-spacing:-.3px">Silver Edition <em>Air Cushion</em></h2>
+    <form id="orderForm" onsubmit="submitOrder(event)">
+      <div style="margin-bottom:1rem">
+        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem">Нэр *</label>
+        <input id="o_name" required placeholder="Таны нэр" style="width:100%;border:.5px solid #e2dbd7;background:#fff;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none">
+      </div>
+      <div style="margin-bottom:1rem">
+        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem">Утасны дугаар *</label>
+        <input id="o_phone" required placeholder="8 оронтой дугаар" maxlength="8" pattern="[0-9]{8}" style="width:100%;border:.5px solid #e2dbd7;background:#fff;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none">
+      </div>
+      <div style="margin-bottom:1rem">
+        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem">Хүргэлтийн хаяг *</label>
+        <textarea id="o_address" required placeholder="Дүүрэг, хороо, байр, тоот" rows="2" style="width:100%;border:.5px solid #e2dbd7;background:#fff;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none;resize:none"></textarea>
+      </div>
+      <div style="margin-bottom:1.5rem;display:flex;gap:1rem;align-items:center">
+        <div style="flex:1">
+          <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem">Тоо ширхэг</label>
+          <input id="o_qty" type="number" min="1" max="10" value="1" style="width:100%;border:.5px solid #e2dbd7;background:#fff;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none">
+        </div>
+        <div style="flex:1;padding-top:1.3rem">
+          <p style="font-size:9px;color:#6b5f5a">НӨЭТ: <strong id="modalVat">НӨЭТ-гүй (61,110₮)</strong></p>
+        </div>
+      </div>
+      <button id="orderSubmitBtn" type="submit" style="width:100%;background:#2a2420;color:#f9f5ee;padding:14px;font-size:9px;letter-spacing:3px;text-transform:uppercase;border:none;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:500">Захиалах</button>
+    </form>
+    <div id="orderResult" style="margin-top:1rem;text-align:center"></div>
+  </div>
+</div>
+
+<style>
+.qr-wrap{padding:1rem 0}
+.or-no{font-size:11px;letter-spacing:1px;color:#2a2420;margin-bottom:1rem;font-weight:500}
+.qr-img{width:200px;height:200px;border:.5px solid #e2dbd7}
+.qr-hint{font-size:10px;color:#6b5f5a;margin-top:.8rem}
+.qr-amt{font-size:18px;font-weight:600;color:#2a2420;margin-top:.5rem;letter-spacing:-0.5px}
+.or-success{background:#fff;padding:1.5rem;border:.5px solid #e2dbd7}
+.or-success p{font-size:12px;color:#6b5f5a;line-height:1.7}
+.or-warn{font-size:10px;color:#c8a882;margin-top:.5rem}
+.or-err{color:#c0392b;font-size:11px}
+</style>
+
+<script src="js/main.js"></script>
+</body></html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>femmora — Admin</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--dk:#2a2420;--md:#6b5f5a;--sp:#f9f5ee;--g:#e2dbd7;--w:#fff;--sv:#c8c4c0;
+  --green:#27ae60;--yellow:#f39c12;--blue:#2980b9;--red:#c0392b;--purple:#8e44ad}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f4f1ed;color:var(--dk);min-height:100vh}
+
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--dk)}
+.login-box{background:var(--sp);padding:3rem 2.5rem;width:340px}
+.login-logo{font-size:22px;font-weight:300;letter-spacing:3px;text-transform:uppercase;margin-bottom:.3rem}
+.login-sub{font-size:10px;letter-spacing:2px;color:var(--sv);text-transform:uppercase;margin-bottom:2rem}
+.login-box input{width:100%;border:.5px solid var(--g);background:var(--w);padding:11px 14px;
+  font-size:13px;color:var(--dk);outline:none;margin-bottom:1rem;font-family:inherit}
+.login-box input:focus{border-color:var(--dk)}
+.btn-login{width:100%;background:var(--dk);color:var(--sp);padding:12px;font-size:10px;
+  letter-spacing:3px;text-transform:uppercase;border:none;cursor:pointer;font-family:inherit;font-weight:500}
+.btn-login:hover{background:var(--md)}
+.login-err{font-size:11px;color:var(--red);margin-top:.7rem;min-height:16px}
+
+/* LAYOUT */
+#appScreen{display:none;min-height:100vh}
+.sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--dk);padding:0;
+  display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:1.5rem 1.5rem 1rem;border-bottom:.5px solid rgba(255,255,255,.08)}
+.sidebar-logo-text{font-size:16px;font-weight:300;letter-spacing:3px;color:var(--sp);text-transform:uppercase}
+.sidebar-logo-sub{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.35);text-transform:uppercase;margin-top:2px}
+.nav-items{padding:1rem 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.75rem 1.5rem;cursor:pointer;
+  font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.5);transition:all .15s;border-left:2px solid transparent;
+  text-transform:uppercase}
+.nav-item:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--sp);border-left-color:var(--sp);background:rgba(255,255,255,.06)}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.sidebar-footer{padding:1rem 1.5rem;border-top:.5px solid rgba(255,255,255,.08)}
+.btn-logout{background:none;border:.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);
+  padding:7px 14px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:100%;
+  font-family:inherit;transition:all .2s}
+.btn-logout:hover{border-color:rgba(255,255,255,.5);color:rgba(255,255,255,.8)}
+
+.main{margin-left:220px;min-height:100vh}
+.topbar{background:var(--w);padding:1rem 2rem;border-bottom:.5px solid var(--g);
+  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:14px;font-weight:500;color:var(--dk);letter-spacing:.3px}
+.topbar-time{font-size:10px;color:var(--sv);letter-spacing:1px}
+.content{padding:2rem}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* STATS CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--w);padding:1.5rem;border:.5px solid var(--g);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.stat-card.green::before{background:var(--green)}
+.stat-card.yellow::before{background:var(--yellow)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-card.purple::before{background:var(--purple)}
+.stat-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sv);margin-bottom:.5rem}
+.stat-value{font-size:28px;font-weight:300;color:var(--dk);letter-spacing:-1px;line-height:1}
+.stat-sub{font-size:10px;color:var(--md);margin-top:.4rem}
+
+/* CHART */
+.chart-card{background:var(--w);border:.5px solid var(--g);padding:1.5rem;margin-bottom:2rem}
+.chart-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sv);margin-bottom:1.2rem}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:120px}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.chart-bar{width:100%;background:var(--dk);min-height:2px;transition:height .4s;border-radius:1px 1px 0 0}
+.chart-bar-label{font-size:8px;color:var(--sv);letter-spacing:.5px;white-space:nowrap}
+.chart-bar-val{font-size:8px;color:var(--md);letter-spacing:.5px}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;font-weight:500;border-radius:2px}
+.badge-pending{background:#fef9ec;color:#b8860b;border:.5px solid #f0d080}
+.badge-paid{background:#eafaf1;color:#1e8449;border:.5px solid #7dcea0}
+.badge-shipped{background:#ebf5fb;color:#1a5276;border:.5px solid #85c1e9}
+.badge-delivered{background:#f4ecf7;color:#6c3483;border:.5px solid #bb8fce}
+.badge-cancelled{background:#fdedec;color:#922b21;border:.5px solid #f1948a}
+
+/* TABLE */
+.table-wrap{background:var(--w);border:.5px solid var(--g);overflow:hidden}
+.table-toolbar{padding:1rem 1.5rem;border-bottom:.5px solid var(--g);display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.search-input{border:.5px solid var(--g);padding:7px 12px;font-size:12px;color:var(--dk);
+  outline:none;font-family:inherit;width:220px;background:var(--sp)}
+.search-input:focus{border-color:var(--dk)}
+.filter-btn{padding:6px 14px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  border:.5px solid var(--g);background:transparent;cursor:pointer;color:var(--md);font-family:inherit;transition:all .15s}
+.filter-btn.active{background:var(--dk);color:var(--sp);border-color:var(--dk)}
+.filter-btn:hover:not(.active){border-color:var(--md)}
+table{width:100%;border-collapse:collapse}
+th{padding:.75rem 1rem;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--sv);
+  text-align:left;border-bottom:.5px solid var(--g);font-weight:500;background:var(--sp)}
+td{padding:.85rem 1rem;font-size:12px;color:var(--md);border-bottom:.5px solid rgba(226,219,215,.5)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf8f5}
+.order-no{font-weight:600;color:var(--dk);font-size:11px;letter-spacing:.5px}
+.customer-name{color:var(--dk);font-weight:500}
+td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* STATUS SELECT */
+.status-select{border:.5px solid var(--g);padding:4px 8px;font-size:10px;color:var(--dk);
+  background:var(--w);cursor:pointer;font-family:inherit;outline:none}
+.status-select:focus{border-color:var(--dk)}
+
+/* ACTION BUTTONS */
+.btn-del{background:none;border:.5px solid var(--g);color:var(--red);padding:4px 10px;
+  font-size:9px;cursor:pointer;font-family:inherit;letter-spacing:1px;text-transform:uppercase;transition:all .15s}
+.btn-del:hover{background:var(--red);color:var(--w);border-color:var(--red)}
+
+.empty-state{padding:4rem;text-align:center;color:var(--sv);font-size:12px;letter-spacing:.5px}
+
+/* LOADING */
+.loading{opacity:.5;pointer-events:none}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--g);
+  border-top-color:var(--dk);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+#toast{position:fixed;bottom:2rem;right:2rem;background:var(--dk);color:var(--sp);padding:.8rem 1.5rem;
+  font-size:11px;letter-spacing:.5px;z-index:9999;transform:translateY(100px);opacity:0;
+  transition:all .3s;pointer-events:none}
+#toast.show{transform:translateY(0);opacity:1}
+
+/* SETTINGS PAGE */
+.settings-card{background:var(--w);border:.5px solid var(--g);padding:1.5rem;max-width:500px}
+.settings-card h3{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--sv);margin-bottom:1.2rem}
+.field{margin-bottom:1rem}
+.field label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--md);display:block;margin-bottom:.4rem}
+.field input{width:100%;border:.5px solid var(--g);background:var(--sp);padding:9px 12px;
+  font-size:12px;color:var(--dk);outline:none;font-family:inherit}
+.field input:focus{border-color:var(--dk)}
+.btn-save{background:var(--dk);color:var(--sp);padding:10px 24px;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;border:none;cursor:pointer;font-family:inherit;font-weight:500;margin-top:.5rem}
+.btn-save:hover{background:var(--md)}
+
+@media(max-width:768px){
+  .sidebar{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto}
+  .main{margin-left:0}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .nav-items{display:flex;padding:.5rem}
+  .nav-item{padding:.6rem 1rem;border-left:none;border-bottom:2px solid transparent;white-space:nowrap}
+  .nav-item.active{border-bottom-color:var(--sp);border-left-color:transparent}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">femmora</div>
+    <div class="login-sub">Admin Panel</div>
+    <input type="password" id="pwInput" placeholder="Нууц үг" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn-login" onclick="login()">Нэвтрэх</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-text">femmora</div>
+      <div class="sidebar-logo-sub">Admin · 2025</div>
+    </div>
+    <div class="nav-items">
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <span class="nav-icon">▣</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('orders')">
+        <span class="nav-icon">☰</span> Захиалгууд
+      </div>
+      <div class="nav-item" onclick="showPage('settings')">
+        <span class="nav-icon">◎</span> Тохиргоо
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="logout()">Гарах</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-time" id="topbarTime"></div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card green">
+            <div class="stat-label">Нийт орлого</div>
+            <div class="stat-value" id="s-revenue">—</div>
+            <div class="stat-sub">Төлөгдсөн захиалга</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-label">Нийт захиалга</div>
+            <div class="stat-value" id="s-total">—</div>
+            <div class="stat-sub" id="s-pending-sub">— хүлээгдэж байна</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Хүргэлтэнд</div>
+            <div class="stat-value" id="s-shipped">—</div>
+            <div class="stat-sub">Замд явж байна</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-label">Хүргэгдсэн</div>
+            <div class="stat-value" id="s-delivered">—</div>
+            <div class="stat-sub">Амжилттай дууссан</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">7 хоногийн орлого (₮)</div>
+          <div class="chart-bars" id="chartBars"></div>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-toolbar" style="border-bottom:.5px solid var(--g)">
+            <span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sv)">Сүүлийн захиалгууд</span>
+          </div>
+          <table id="recentTable">
+            <thead><tr>
+              <th>Захиалга №</th><th>Хэрэглэгч</th><th>Дүн</th><th>Статус</th><th>Огноо</th>
+            </tr></thead>
+            <tbody id="recentBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ORDERS PAGE -->
+      <div class="page" id="page-orders">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <input class="search-input" id="searchInput" placeholder="Нэр, утас, захиалга №..." oninput="filterOrders()">
+            <button class="filter-btn active" onclick="setFilter('all',this)">Бүгд</button>
+            <button class="filter-btn" onclick="setFilter('pending',this)">Хүлээгдэж байна</button>
+            <button class="filter-btn" onclick="setFilter('paid',this)">Төлөгдсөн</button>
+            <button class="filter-btn" onclick="setFilter('shipped',this)">Хүргэлтэнд</button>
+            <button class="filter-btn" onclick="setFilter('delivered',this)">Хүргэгдсэн</button>
+            <button class="filter-btn" onclick="setFilter('cancelled',this)">Цуцлагдсан</button>
+            <button class="btn-save" style="margin-top:0;margin-left:auto" onclick="loadOrders()">⟳ Шинэчлэх</button>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Захиалга №</th>
+              <th>Хэрэглэгч</th>
+              <th>Утас</th>
+              <th>Тоо</th>
+              <th>Дүн</th>
+              <th>Статус</th>
+              <th>Огноо</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+          <div id="ordersEmpty" class="empty-state" style="display:none">Захиалга байхгүй байна</div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div class="page" id="page-settings">
+        <div class="settings-card">
+          <h3>Нууц үг солих</h3>
+          <div class="field">
+            <label>Шинэ нууц үг</label>
+            <input type="password" id="newPw" placeholder="Шинэ нууц үг оруулна уу">
+          </div>
+          <div class="field">
+            <label>Давтах</label>
+            <input type="password" id="newPw2" placeholder="Дахин оруулна уу">
+          </div>
+          <button class="btn-save" onclick="changePw()">Хадгалах</button>
+          <div id="pwMsg" style="margin-top:.7rem;font-size:11px;color:var(--md)"></div>
+        </div>
+
+        <div class="settings-card" style="margin-top:1.5rem">
+          <h3>Захиалга экспорт</h3>
+          <p style="font-size:11px;color:var(--md);margin-bottom:1rem;line-height:1.7">Бүх захиалгыг CSV файлаар татаж авах.</p>
+          <button class="btn-save" onclick="exportCSV()">CSV татах</button>
+        </div>
+
+        <div class="settings-card" style="margin-top:1.5rem">
+          <h3>Системийн мэдээлэл</h3>
+          <p style="font-size:11px;color:var(--md);line-height:1.9">
+            Сервер: <strong>Node.js + Express</strong><br>
+            Database: <strong>orders.json</strong><br>
+            Frontend: <strong>dist/</strong><br>
+            Admin: <strong>dist/admin/</strong>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var token = localStorage.getItem('fm_admin_token');
+var currentFilter = 'all';
+var allOrders = [];
+
+// Clock
+setInterval(function(){
+  var d = new Date();
+  document.getElementById('topbarTime').textContent =
+    d.toLocaleDateString('mn-MN') + ' ' + d.toLocaleTimeString('mn-MN');
+}, 1000);
+
+// Auth check
+if (token) showApp();
+
+async function login() {
+  var pw = document.getElementById('pwInput').value;
+  document.getElementById('loginErr').textContent = '';
+  try {
+    var r = await api('/api/admin/login', 'POST', { password: pw });
+    token = r.token;
+    localStorage.setItem('fm_admin_token', token);
+    showApp();
+  } catch(e) {
+    document.getElementById('loginErr').textContent = e.message || 'Нэвтрэх боломжгүй';
+  }
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  loadDashboard();
+}
+
+async function logout() {
+  try { await api('/api/admin/logout', 'POST'); } catch(e){}
+  token = null;
+  localStorage.removeItem('fm_admin_token');
+  location.reload();
+}
+
+// Navigation
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  var titles = { dashboard: 'Dashboard', orders: 'Захиалгууд', settings: 'Тохиргоо' };
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+  if (name === 'orders') loadOrders();
+}
+
+// API helper
+async function api(url, method, body) {
+  var opts = { method: method || 'GET', headers: { 'Content-Type': 'application/json' } };
+  if (token) opts.headers['x-admin-token'] = token;
+  if (body) opts.body = JSON.stringify(body);
+  var r = await fetch(url, opts);
+  if (r.status === 401) {
+    token = null; localStorage.removeItem('fm_admin_token'); location.reload(); return;
+  }
+  var j = await r.json();
+  if (!r.ok) throw new Error(j.error || 'Алдаа гарлаа');
+  return j;
+}
+
+// Toast
+function toast(msg, ok) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = ok === false ? '#c0392b' : '#2a2420';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// DASHBOARD
+async function loadDashboard() {
+  try {
+    var s = await api('/api/admin/stats');
+    document.getElementById('s-revenue').textContent = s.revenue.toLocaleString() + '₮';
+    document.getElementById('s-total').textContent = s.total;
+    document.getElementById('s-pending-sub').textContent = s.pending + ' хүлээгдэж байна';
+    document.getElementById('s-shipped').textContent = s.shipped;
+    document.getElementById('s-delivered').textContent = s.delivered;
+    drawChart(s.daily);
+    loadRecentOrders();
+  } catch(e) { toast('Dashboard ачаалах алдаа: ' + e.message, false); }
+}
+
+function drawChart(daily) {
+  var entries = Object.entries(daily);
+  var max = Math.max(...entries.map(e => e[1]), 1);
+  var html = entries.map(function([day, val]) {
+    var pct = Math.max((val / max) * 100, val > 0 ? 4 : 1);
+    var label = day.slice(5); // MM-DD
+    var dispVal = val > 0 ? (val/1000).toFixed(0) + 'k' : '';
+    return '<div class="chart-bar-wrap"><div class="chart-bar-val">' + dispVal +
+      '</div><div class="chart-bar" style="height:' + pct + '%"></div>' +
+      '<div class="chart-bar-label">' + label + '</div></div>';
+  }).join('');
+  document.getElementById('chartBars').innerHTML = html;
+}
+
+async function loadRecentOrders() {
+  try {
+    var orders = await api('/api/admin/orders?status=all');
+    var recent = orders.slice(0, 8);
+    var body = document.getElementById('recentBody');
+    if (!recent.length) { body.innerHTML = '<tr><td colspan="5" class="empty-state">Захиалга байхгүй</td></tr>'; return; }
+    body.innerHTML = recent.map(function(o) {
+      return '<tr><td><span class="order-no">' + o.order_no + '</span></td>' +
+        '<td><span class="customer-name">' + esc(o.name) + '</span></td>' +
+        '<td>' + o.amount.toLocaleString() + '₮</td>' +
+        '<td>' + badge(o.status) + '</td>' +
+        '<td>' + fmtDate(o.created_at) + '</td></tr>';
+    }).join('');
+  } catch(e) {}
+}
+
+// ORDERS
+async function loadOrders() {
+  try {
+    var url = '/api/admin/orders?status=' + currentFilter;
+    var q = document.getElementById('searchInput') ? document.getElementById('searchInput').value.trim() : '';
+    if (q) url += '&search=' + encodeURIComponent(q);
+    allOrders = await api(url);
+    renderOrders(allOrders);
+  } catch(e) { toast('Захиалга ачаалах алдаа', false); }
+}
+
+function renderOrders(orders) {
+  var body = document.getElementById('ordersBody');
+  var empty = document.getElementById('ordersEmpty');
+  if (!orders.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  body.innerHTML = orders.map(function(o) {
+    return '<tr>' +
+      '<td><span class="order-no">' + o.order_no + '</span></td>' +
+      '<td><span class="customer-name">' + esc(o.name) + '</span>' +
+        '<div class="address">' + esc(o.address) + '</div></td>' +
+      '<td>' + esc(o.phone) + '</td>' +
+      '<td style="text-align:center">' + o.quantity + '</td>' +
+      '<td><strong>' + o.amount.toLocaleString() + '₮</strong></td>' +
+      '<td><select class="status-select" onchange="updateStatus(\'' + o.order_no + '\',this.value)">' +
+        statusOptions(o.status) + '</select></td>' +
+      '<td style="font-size:10px;white-space:nowrap">' + fmtDate(o.created_at) + '</td>' +
+      '<td><button class="btn-del" onclick="deleteOrder(\'' + o.order_no + '\')">✕</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function statusOptions(cur) {
+  return [['pending','Хүлээгдэж байна'],['paid','Төлөгдсөн'],
+    ['shipped','Хүргэлтэнд'],['delivered','Хүргэгдсэн'],['cancelled','Цуцлагдсан']]
+    .map(function(s){ return '<option value="' + s[0] + '"' + (cur===s[0]?' selected':'') + '>' + s[1] + '</option>'; })
+    .join('');
+}
+
+async function updateStatus(order_no, status) {
+  try {
+    await api('/api/admin/orders/' + order_no, 'PATCH', { status });
+    toast('Статус шинэчлэгдлээ');
+    if (document.getElementById('page-dashboard').classList.contains('active')) loadDashboard();
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+async function deleteOrder(order_no) {
+  if (!confirm(order_no + ' захиалгыг устгах уу?')) return;
+  try {
+    await api('/api/admin/orders/' + order_no, 'DELETE');
+    toast('Захиалга устгагдлаа');
+    loadOrders();
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadOrders();
+}
+
+function filterOrders() {
+  loadOrders();
+}
+
+// SETTINGS
+async function changePw() {
+  var p1 = document.getElementById('newPw').value;
+  var p2 = document.getElementById('newPw2').value;
+  var msg = document.getElementById('pwMsg');
+  if (!p1) { msg.textContent = 'Нууц үг оруулна уу'; return; }
+  if (p1 !== p2) { msg.textContent = 'Нууц үг таарахгүй байна'; return; }
+  msg.textContent = 'Хадгалагдлаа. Server дахин эхлүүлсний дараа .env файлд ADMIN_PASSWORD=' + p1 + ' тавина уу.';
+  toast('Тохиргоо хадгалагдлаа');
+}
+
+async function exportCSV() {
+  try {
+    var orders = await api('/api/admin/orders?status=all');
+    var rows = [['Захиалга №','Нэр','Утас','Хаяг','Тоо','Дүн','НӨЭТ','Статус','Огноо','Төлбөрийн огноо']];
+    orders.forEach(function(o) {
+      rows.push([o.order_no, o.name, o.phone, o.address, o.quantity, o.amount,
+        o.include_vat ? 'Тийм' : 'Үгүй', o.status, fmtDate(o.created_at), o.paid_at ? fmtDate(o.paid_at) : '']);
+    });
+    var csv = '\uFEFF' + rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'femmora_orders_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    toast('CSV татагдлаа');
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+// Helpers
+function badge(status) {
+  var map = { pending:'Хүлээгдэж байна', paid:'Төлөгдсөн', shipped:'Хүргэлтэнд', delivered:'Хүргэгдсэн', cancelled:'Цуцлагдсан' };
+  return '<span class="badge badge-' + status + '">' + (map[status] || status) + '</span>';
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  var d = new Date(s);
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' +
+    String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' +
+    String(d.getMinutes()).padStart(2,'0');
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
