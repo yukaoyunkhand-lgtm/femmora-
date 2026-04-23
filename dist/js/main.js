@@ -1,5 +1,35 @@
 ﻿var isVat=false;
+var isModalDiscount=false;
 var currentLang='mn';
+
+function setModalDiscount(v){
+  isModalDiscount=v;
+  var btnNormal=document.getElementById('optNormal');
+  var btnDiscount=document.getElementById('optDiscount');
+  if(v){
+    btnNormal.style.background='#fff';
+    btnNormal.style.color='#2a2420';
+    btnNormal.style.borderColor='#e2dbd7';
+    btnDiscount.style.background='#2a2420';
+    btnDiscount.style.color='#f9f5ee';
+    btnDiscount.style.borderColor='#2a2420';
+  } else {
+    btnNormal.style.background='#2a2420';
+    btnNormal.style.color='#f9f5ee';
+    btnNormal.style.borderColor='#2a2420';
+    btnDiscount.style.background='#fff';
+    btnDiscount.style.color='#2a2420';
+    btnDiscount.style.borderColor='#e2dbd7';
+  }
+  updateModalPrice();
+}
+
+function updateModalPrice(){
+  var qty=Number(document.getElementById('o_qty').value)||1;
+  var unitPrice=isModalDiscount?61110:67900;
+  var total=unitPrice*qty;
+  document.getElementById('modalPriceTotal').innerHTML='Нийт: <strong>'+total.toLocaleString()+'₮</strong>';
+}
 
 function toggleAuthMenu(){
   var m=document.getElementById('authMenu');
@@ -22,6 +52,8 @@ function closeOrderModal(){
   document.body.style.overflow='';
   document.getElementById('orderForm').reset();
   document.getElementById('orderResult').innerHTML='';
+  isModalDiscount=false;
+  setModalDiscount(false);
 }
 
 // Захиалга илгээх
@@ -35,7 +67,7 @@ async function submitOrder(e){
     phone:document.getElementById('o_phone').value.trim(),
     address:document.getElementById('o_address').value.trim(),
     quantity:Number(document.getElementById('o_qty').value),
-    include_vat:isVat,
+    include_vat:!isModalDiscount,
     uid:window._currentUid||null
   };
   var res=document.getElementById('orderResult');
