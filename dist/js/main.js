@@ -1,4 +1,4 @@
-﻿var isVat=false;
+﻿var isVat=false; // НӨАТ-гүй үнэ ашиглана (62,010₮)
 var currentLang='mn';
 
 function toggleAuthMenu(){
@@ -61,7 +61,7 @@ function showVat(v){
   isVat=v;
   document.getElementById('vatBtn').classList.toggle('active',v);
   document.getElementById('novatBtn').classList.toggle('active',!v);
-  document.getElementById('priceDisplay').textContent=v?'67,900₮':'61,110₮';
+  document.getElementById('priceDisplay').textContent=v?'68,900₮':'62,010₮';
   var l=document.querySelector('.lb.active').id;
   l=l==='bn'?'mn':l==='bk'?'ko':'en';
   var n={mn:[' НӨЭТ-гүй үнэ','НӨЭТ-тэй үнэ'],ko:['부가세 제외 가격','부가세 포함 가격'],en:['Price excl. VAT','Price incl. VAT']};

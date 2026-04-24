@@ -3,8 +3,8 @@ const router = express.Router();
 const db = require('../db');
 const { createInvoice } = require('./qpay');
 
-const PRICE_EXCL = 61110;
-const PRICE_INCL = 67900;
+const PRICE_EXCL = 62010;
+const PRICE_INCL = 68900;
 const COL = 'orders';
 
 function genOrderNo() {
