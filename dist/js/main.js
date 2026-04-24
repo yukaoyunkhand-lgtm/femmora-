@@ -1,33 +1,8 @@
-﻿var isVat=false;
-var isModalDiscount=false;
 var currentLang='mn';
-
-function setModalDiscount(v){
-  isModalDiscount=v;
-  var btnNormal=document.getElementById('optNormal');
-  var btnDiscount=document.getElementById('optDiscount');
-  if(v){
-    btnNormal.style.background='#fff';
-    btnNormal.style.color='#2a2420';
-    btnNormal.style.borderColor='#e2dbd7';
-    btnDiscount.style.background='#2a2420';
-    btnDiscount.style.color='#f9f5ee';
-    btnDiscount.style.borderColor='#2a2420';
-  } else {
-    btnNormal.style.background='#2a2420';
-    btnNormal.style.color='#f9f5ee';
-    btnNormal.style.borderColor='#2a2420';
-    btnDiscount.style.background='#fff';
-    btnDiscount.style.color='#2a2420';
-    btnDiscount.style.borderColor='#e2dbd7';
-  }
-  updateModalPrice();
-}
 
 function updateModalPrice(){
   var qty=Number(document.getElementById('o_qty').value)||1;
-  var unitPrice=isModalDiscount?62010:68900;
-  var total=unitPrice*qty;
+  var total=62010*qty;
   document.getElementById('modalPriceTotal').innerHTML='Нийт: <strong>'+total.toLocaleString()+'₮</strong>';
 }
 
@@ -46,14 +21,14 @@ document.addEventListener('click',function(e){
 function openOrderModal(){
   document.getElementById('orderModal').style.display='flex';
   document.body.style.overflow='hidden';
+  updateModalPrice();
 }
 function closeOrderModal(){
   document.getElementById('orderModal').style.display='none';
   document.body.style.overflow='';
   document.getElementById('orderForm').reset();
   document.getElementById('orderResult').innerHTML='';
-  isModalDiscount=false;
-  setModalDiscount(false);
+  updateModalPrice();
 }
 
 // Захиалга илгээх
@@ -67,7 +42,7 @@ async function submitOrder(e){
     phone:document.getElementById('o_phone').value.trim(),
     address:document.getElementById('o_address').value.trim(),
     quantity:Number(document.getElementById('o_qty').value),
-    include_vat:!isModalDiscount,
+    include_vat:false,
     uid:window._currentUid||null
   };
   var res=document.getElementById('orderResult');
@@ -89,22 +64,11 @@ async function submitOrder(e){
     btn.textContent={mn:'Захиалах',ko:'주문하기',en:'Order'}[currentLang]||'Захиалах';
   }
 }
-function showVat(v){
-  isVat=v;
-  document.getElementById('vatBtn').classList.toggle('active',v);
-  document.getElementById('novatBtn').classList.toggle('active',!v);
-  document.getElementById('priceDisplay').textContent=v?'68,900₮':'62,010₮';
-  var l=document.querySelector('.lb.active').id;
-  l=l==='bn'?'mn':l==='bk'?'ko':'en';
-  var n={mn:[' НӨЭТ-гүй үнэ','НӨЭТ-тэй үнэ'],ko:['부가세 제외 가격','부가세 포함 가격'],en:['Price excl. VAT','Price incl. VAT']};
-  document.getElementById('priceNote').textContent=n[l][v?1:0];
-}
+
 function setLang(l){
   currentLang=l;
   if(typeof window._logLang==='function') window._logLang(l);
   document.querySelectorAll('.lb').forEach(function(b){b.classList.remove('active');});
   document.getElementById(l==='mn'?'bn':l==='ko'?'bk':'be').classList.add('active');
   document.querySelectorAll('.t').forEach(function(el){var v=el.getAttribute('data-'+l);if(v)el.innerHTML=v;});
-  var n={mn:[' НӨЭТ-гүй үнэ','НӨЭТ-тэй үнэ'],ko:['부가세 제외 가격','부가세 포함 가격'],en:['Price excl. VAT','Price incl. VAT']};
-  document.getElementById('priceNote').textContent=n[l][isVat?1:0];
 }

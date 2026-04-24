@@ -61,14 +61,11 @@
     <p style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.6rem;font-weight:400" class="t" data-mn="Худалдан авах" data-ko="구매하기" data-en="Purchase">Худалдан авах</p>
     <p style="font-size:22px;font-weight:200;color:var(--sp);letter-spacing:-.5px">Silver Edition Semi-Matte Air Cushion</p>
   </div>
-  <div class="price-toggle">
-    <button class="pt-btn active" id="novatBtn"><span class="t" data-mn="НӨЭТ-гүй үнэ" data-ko="부가세 제외 가격" data-en="Excl. VAT">НӨЭТ-гүй үнэ</span></button>
-  </div>
   <div class="price-inner">
     <div class="price-col">
       <p class="price-label t" data-mn="Үнэ" data-ko="가격" data-en="Price">Үнэ</p>
-      <p class="price-amount" id="priceDisplay">62,010₮</p>
-      <p class="price-note" id="priceNote">НӨЭТ-гүй үнэ</p>
+      <p class="price-amount" id="priceDisplay">68,900₮</p>
+      <p class="price-note" id="priceNote"></p>
     </div>
     <div class="price-divider"></div>
     <div class="price-col">
@@ -222,31 +219,14 @@
         <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem">Хүргэлтийн хаяг *</label>
         <textarea id="o_address" required placeholder="Дүүрэг, хороо, байр, тоот" rows="2" style="width:100%;border:.5px solid #e2dbd7;background:#fff;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none;resize:none"></textarea>
       </div>
-<<<<<<< HEAD
       <div style="margin-bottom:1.5rem;display:flex;gap:1rem;align-items:center">
         <div style="flex:1">
           <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem">Тоо ширхэг</label>
-          <input id="o_qty" type="number" min="1" max="10" value="1" style="width:100%;border:.5px solid #e2dbd7;background:#fff;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none">
+          <input id="o_qty" type="number" min="1" max="10" value="1" oninput="updateModalPrice()" style="width:100%;border:.5px solid #e2dbd7;background:#fff;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none">
         </div>
         <div style="flex:1;padding-top:1.3rem">
-          <p style="font-size:9px;color:#6b5f5a">Үнэ: <strong id="modalVat">НӨЭТ-гүй · 62,010₮</strong></p>
-=======
-      <div style="margin-bottom:1rem">
-        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem">Тоо ширхэг</label>
-        <input id="o_qty" type="number" min="1" max="10" value="1" oninput="updateModalPrice()" style="width:100%;border:.5px solid #e2dbd7;background:#fff;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none">
-      </div>
-      <div style="margin-bottom:1.5rem">
-        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.8rem">Төлбөрийн сонголт</label>
-        <div style="display:flex;gap:.6rem">
-          <button type="button" id="optNormal" onclick="setModalDiscount(false)" style="flex:1;padding:12px 8px;border:.5px solid #2a2420;background:#2a2420;color:#f9f5ee;font-family:Montserrat,sans-serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer">
-            НӨАТ-тай<br><span style="font-size:13px;font-weight:600;letter-spacing:0">67,900₮</span>
-          </button>
-          <button type="button" id="optDiscount" onclick="setModalDiscount(true)" style="flex:1;padding:12px 8px;border:.5px solid #e2dbd7;background:#fff;color:#2a2420;font-family:Montserrat,sans-serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer">
-            НӨАТ-гүй · 10% хөнгөлөлт<br><span style="font-size:13px;font-weight:600;letter-spacing:0">61,110₮</span>
-          </button>
->>>>>>> ef0180c123a735ea5eee2c7dcc25a9cc65d8fd8e
+          <p id="modalPriceTotal" style="font-size:13px;font-weight:600;color:#2a2420">Нийт: <strong>62,010₮</strong></p>
         </div>
-        <p id="modalPriceTotal" style="font-size:11px;color:#6b5f5a;margin-top:.6rem;text-align:right">Нийт: <strong>67,900₮</strong></p>
       </div>
       <button id="orderSubmitBtn" type="submit" style="width:100%;background:#2a2420;color:#f9f5ee;padding:14px;font-size:9px;letter-spacing:3px;text-transform:uppercase;border:none;cursor:pointer;font-family:Montserrat,sans-serif;font-weight:500">Захиалах</button>
     </form>
