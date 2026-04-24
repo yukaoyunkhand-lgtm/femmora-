@@ -34,6 +34,7 @@ router.post('/', async (req, res) => {
     address,
     quantity: Number(quantity),
     include_vat: !!include_vat,
+    discount_applied: !include_vat,
     amount,
     status: 'pending',
     uid: req.body.uid || null,
