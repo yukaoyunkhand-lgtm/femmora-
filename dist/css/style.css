@@ -106,6 +106,15 @@ h2 em{font-style:italic;font-weight:300}
 .cim img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .5s}
 .cim:hover img{transform:scale(1.04)}
 @keyframes cs{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.reviews-sec{background:var(--sp);padding:5rem 3rem}
+.reviews-sec .eh{margin-bottom:2.5rem}
+.review-card{background:#fff;padding:1.8rem;border:.5px solid #e2dbd7}
+.review-stars{color:#c8a96e;font-size:14px;letter-spacing:2px;margin-bottom:.6rem}
+.review-name{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#c8c4c0;margin-bottom:.5rem;font-weight:500}
+.review-comment{font-size:12px;color:#6b5f5a;line-height:1.8;font-weight:300}
+.b2b-sec{background:var(--dk);padding:5rem 3rem}
+.b2b-sec input::placeholder,.b2b-sec textarea::placeholder{color:rgba(255,255,255,.25);font-family:Montserrat,sans-serif;font-size:11px}
+.b2b-sec input:focus,.b2b-sec textarea:focus{border-color:rgba(255,255,255,.4)!important;outline:none}
 footer{background:var(--dk);padding:4rem 3rem;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem}
 .fl{height:20px;margin-bottom:.9rem;display:block}
 .fta{font-size:10px;color:rgba(255,255,255,.6);line-height:1.8;font-weight:300;letter-spacing:.5px}
@@ -115,4 +124,4 @@ footer{background:var(--dk);padding:4rem 3rem;display:grid;grid-template-columns
 .fls a:hover{color:rgba(255,255,255,.85)}
 .fb{grid-column:1/-1;padding-top:2rem;border-top:.5px solid rgba(255,255,255,.1);display:flex;justify-content:space-between}
 .fc{font-size:9px;color:rgba(255,255,255,.45);font-weight:300;letter-spacing:1px}
-@media(max-width:900px){nav .nl{display:none}.hero{grid-template-columns:1fr;height:auto}.hi{height:70vw}.ht{padding:3rem 1.5rem}h1{font-size:30px}.about{grid-template-columns:1fr;gap:2rem}.pl2{grid-template-columns:1fr}.sg{grid-template-columns:1fr}.eg{grid-template-columns:1fr 1fr;grid-template-rows:auto}.ec.tall{grid-row:auto}.ig{grid-template-columns:1fr}footer{grid-template-columns:1fr 1fr}.sec{padding:3.5rem 1.5rem}.price-inner{grid-template-columns:1fr;gap:2rem}.price-divider{display:none}}
+@media(max-width:900px){nav .nl{display:none}.hero{grid-template-columns:1fr;height:auto}.hi{height:70vw}.ht{padding:3rem 1.5rem}h1{font-size:30px}.about{grid-template-columns:1fr;gap:2rem}.pl2{grid-template-columns:1fr}.sg{grid-template-columns:1fr}.eg{grid-template-columns:1fr 1fr;grid-template-rows:auto}.ec.tall{grid-row:auto}.ig{grid-template-columns:1fr}footer{grid-template-columns:1fr 1fr}.sec{padding:3.5rem 1.5rem}.price-inner{grid-template-columns:1fr;gap:2rem}.price-divider{display:none}.b2b-sec>div{grid-template-columns:1fr!important;gap:2rem}.reviews-sec{padding:3.5rem 1.5rem}.b2b-sec{padding:3.5rem 1.5rem}}

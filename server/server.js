@@ -20,6 +20,8 @@ try {
   app.use('/api/qpay',      require('./routes/qpay'));
   app.use('/api/admin',     require('./routes/admin'));
   app.use('/api/my-orders', require('./routes/myorders'));
+  app.use('/api/reviews',   require('./routes/reviews'));
+  app.use('/api/b2b',       require('./routes/b2b'));
 } catch (e) {
   console.error('Route load error:', e.message);
   app.use('/api', (_, res) => res.status(500).json({ error: e.message }));
