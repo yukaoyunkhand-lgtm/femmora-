@@ -11,7 +11,9 @@ function getDb() {
     let credential;
 
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-      const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      // BOM (﻿) болон тэргүүлэх whitespace-г цэвэрлэнэ
+      const raw = process.env.FIREBASE_SERVICE_ACCOUNT.replace(/^﻿/, '').trim();
+      const sa = JSON.parse(raw);
       if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, '\n');
       credential = admin.credential.cert(sa);
     } else {
