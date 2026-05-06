@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="ko">
+<html lang="mn">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>femmora — Silver Edition Semi-Matte Air Cushion</title>
@@ -10,8 +10,8 @@
 <body>
 
 <div class="lb-bar">
-  <button class="lb active" id="bk" onclick="setLang('ko')">KO</button>
-  <button class="lb" id="bn" onclick="setLang('mn')">MN</button>
+  <button class="lb active" id="bn" onclick="setLang('mn')">MN</button>
+  <button class="lb" id="bk" onclick="setLang('ko')">KO</button>
   <button class="lb" id="be" onclick="setLang('en')">EN</button>
 </div>
 <nav>
@@ -194,24 +194,24 @@
 <!-- Сэтгэгдэл -->
 <section class="reviews-sec sec" id="reviews">
   <div class="eh"><div>
-    <p class="sl t" data-mn="Хэрэглэгчийн сэтгэгдэл" data-ko="고객 리뷰" data-en="Customer Reviews">고객 리뷰</p>
-    <h2 class="t" data-mn="Бодит <em>үнэлгээ</em>" data-ko="실제 <em>후기</em>" data-en="Real <em>Reviews</em>">실제 <em>후기</em></h2>
+    <p class="sl t" data-mn="Хэрэглэгчийн сэтгэгдэл" data-ko="고객 리뷰" data-en="Customer Reviews">Хэрэглэгчийн сэтгэгдэл</p>
+    <h2 class="t" data-mn="Бодит <em>үнэлгээ</em>" data-ko="실제 <em>후기</em>" data-en="Real <em>Reviews</em>">Бодит <em>үнэлгээ</em></h2>
   </div></div>
   <div id="reviewsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;margin-bottom:3rem">
     <div style="text-align:center;color:var(--md);font-size:12px;padding:2rem;grid-column:1/-1" id="reviewsLoading">
-      <span class="t" data-mn="Сэтгэгдэл ачааллаж байна..." data-ko="리뷰를 불러오는 중..." data-en="Loading reviews...">리뷰를 불러오는 중...</span>
+      <span class="t" data-mn="Сэтгэгдэл ачааллаж байна..." data-ko="리뷰를 불러오는 중..." data-en="Loading reviews...">Сэтгэгдэл ачааллаж байна...</span>
     </div>
   </div>
   <div style="max-width:560px;margin:0 auto;background:#fff;padding:2.5rem;border:.5px solid #e2dbd7">
     <p style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#c8c4c0;margin-bottom:.5rem">Review</p>
-    <h3 style="font-size:18px;font-weight:200;margin-bottom:1.5rem;letter-spacing:-.3px" class="t" data-mn="Сэтгэгдэлээ <em>үлдээгээрэй</em>" data-ko="리뷰를 <em>남겨주세요</em>" data-en="Leave a <em>Review</em>">리뷰를 <em>남겨주세요</em></h3>
+    <h3 style="font-size:18px;font-weight:200;margin-bottom:1.5rem;letter-spacing:-.3px" class="t" data-mn="Сэтгэгдэлээ <em>үлдээгээрэй</em>" data-ko="리뷰를 <em>남겨주세요</em>" data-en="Leave a <em>Review</em>">Сэтгэгдэлээ <em>үлдээгээрэй</em></h3>
     <form id="reviewForm" onsubmit="submitReview(event)">
       <div style="margin-bottom:1rem">
-        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem" class="t" data-mn="Нэр" data-ko="이름" data-en="Name">이름</label>
-        <input id="rv_name" required placeholder="홍길동" style="width:100%;border:.5px solid #e2dbd7;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none;box-sizing:border-box">
+        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem" class="t" data-mn="Нэр" data-ko="이름" data-en="Name">Нэр</label>
+        <input id="rv_name" required placeholder="Таны нэр" style="width:100%;border:.5px solid #e2dbd7;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none;box-sizing:border-box">
       </div>
       <div style="margin-bottom:1rem">
-        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.6rem" class="t" data-mn="Үнэлгээ" data-ko="평점" data-en="Rating">평점</label>
+        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.6rem" class="t" data-mn="Үнэлгээ" data-ko="평점" data-en="Rating">Үнэлгээ</label>
         <div id="starSelect" style="display:flex;gap:.5rem">
           <span class="star-btn" data-v="1" onclick="setRating(1)" style="font-size:22px;cursor:pointer;color:#e2dbd7">★</span>
           <span class="star-btn" data-v="2" onclick="setRating(2)" style="font-size:22px;cursor:pointer;color:#e2dbd7">★</span>
@@ -222,10 +222,10 @@
         <input type="hidden" id="rv_rating" value="5">
       </div>
       <div style="margin-bottom:1.5rem">
-        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem" class="t" data-mn="Сэтгэгдэл" data-ko="리뷰 내용" data-en="Comment">리뷰 내용</label>
-        <textarea id="rv_comment" required rows="3" placeholder="제품 사용 후기를 작성해 주세요..." style="width:100%;border:.5px solid #e2dbd7;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none;resize:none;box-sizing:border-box"></textarea>
+        <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6b5f5a;display:block;margin-bottom:.4rem" class="t" data-mn="Сэтгэгдэл" data-ko="리뷰 내용" data-en="Comment">Сэтгэгдэл</label>
+        <textarea id="rv_comment" required rows="3" placeholder="Бүтээгдэхүүний тухай сэтгэгдэлээ бичнэ үү..." style="width:100%;border:.5px solid #e2dbd7;padding:10px 12px;font-family:Montserrat,sans-serif;font-size:12px;color:#2a2420;outline:none;resize:none;box-sizing:border-box"></textarea>
       </div>
-      <button type="submit" id="reviewSubmitBtn" style="width:100%;background:#2a2420;color:#f9f5ee;padding:13px;font-size:9px;letter-spacing:3px;text-transform:uppercase;border:none;cursor:pointer;font-family:Montserrat,sans-serif" class="t" data-mn="Илгээх" data-ko="리뷰 등록" data-en="Submit">리뷰 등록</button>
+      <button type="submit" id="reviewSubmitBtn" style="width:100%;background:#2a2420;color:#f9f5ee;padding:13px;font-size:9px;letter-spacing:3px;text-transform:uppercase;border:none;cursor:pointer;font-family:Montserrat,sans-serif" class="t" data-mn="Илгээх" data-ko="리뷰 등록" data-en="Submit">Илгээх</button>
       <div id="reviewResult" style="margin-top:1rem;font-size:12px;text-align:center"></div>
     </form>
   </div>

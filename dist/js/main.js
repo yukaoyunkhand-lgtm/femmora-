@@ -1,4 +1,4 @@
-var currentLang='ko';
+var currentLang='mn';
 var currentRating=5;
 
 // ---- Хэл тохиргоо ----
@@ -90,11 +90,18 @@ function setRating(v){
   });
 }
 
+// ---- JSON-г аюулгүй уншина ----
+async function safeJson(r){
+  var text=await r.text();
+  try{ return JSON.parse(text); }
+  catch(e){ throw new Error('Серверийн алдаа. Дахин оролдоно уу.'); }
+}
+
 // ---- Сэтгэгдэл ачаалах ----
 async function loadReviews(){
   try{
     var r=await fetch('/api/reviews');
-    var list=await r.json();
+    var list=await safeJson(r);
     var container=document.getElementById('reviewsList');
     if(!list.length){
       container.innerHTML='<div style="text-align:center;color:var(--md);font-size:12px;padding:2rem;grid-column:1/-1">'
@@ -128,7 +135,7 @@ async function submitReview(e){
         comment:document.getElementById('rv_comment').value.trim()
       })
     });
-    var json=await r.json();
+    var json=await safeJson(r);
     if(!r.ok) throw new Error(json.error||'Алдаа');
     res.innerHTML='<span style="color:#6b9e6b">'+{ko:'리뷰가 등록되었습니다 감사합니다!',mn:'Сэтгэгдэл амжилттай илгээгдлээ!',en:'Review submitted, thank you!'}[currentLang]+'</span>';
     document.getElementById('reviewForm').reset();
@@ -159,7 +166,7 @@ async function submitB2B(e){
         message:document.getElementById('b2b_message').value.trim()
       })
     });
-    var json=await r.json();
+    var json=await safeJson(r);
     if(!r.ok) throw new Error(json.error||'Алдаа');
     res.innerHTML='<span style="color:rgba(255,255,255,.8)">'+{ko:'문의가 접수되었습니다. 48시간 이내에 연락드리겠습니다.',mn:'Таны хүсэлт хүлээн авлаа. 48 цагийн дотор холбогдох болно.',en:'Your inquiry has been received. We\'ll contact you within 48 hours.'}[currentLang]+'</span>';
     document.getElementById('b2bForm').reset();
@@ -178,6 +185,6 @@ function esc(s){
 // ---- Эхлүүлэх ----
 document.addEventListener('DOMContentLoaded',function(){
   setRating(5);
-  setLang('ko');
+  setLang('mn');
   loadReviews();
 });
