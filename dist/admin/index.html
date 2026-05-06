@@ -178,6 +178,9 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
       <div class="nav-item" onclick="showPage('orders')">
         <span class="nav-icon">☰</span> Захиалгууд
       </div>
+      <div class="nav-item" onclick="showPage('reviews')">
+        <span class="nav-icon">★</span> Сэтгэгдэл
+      </div>
       <div class="nav-item" onclick="showPage('settings')">
         <span class="nav-icon">◎</span> Тохиргоо
       </div>
@@ -300,6 +303,22 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
         </div>
       </div>
 
+      <!-- REVIEWS PAGE -->
+      <div class="page" id="page-reviews">
+        <div style="padding:2rem;max-width:900px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <div>
+              <h2 style="font-size:18px;font-weight:500;margin-bottom:.3rem">Хэрэглэгчийн сэтгэгдэл</h2>
+              <p style="font-size:11px;color:var(--sv)">★★★★☆ (4-5 од) — вэбд харагдана · ★★★☆☆ (1-3 од) — зөвхөн энд харагдана</p>
+            </div>
+            <button class="btn-save" style="margin:0" onclick="loadAllReviews()">⟳ Шинэчлэх</button>
+          </div>
+          <div id="reviewsAdminList">
+            <p style="color:var(--sv);font-size:12px">Ачааллаж байна...</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -353,9 +372,10 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   event.currentTarget.classList.add('active');
-  var titles = { dashboard: 'Dashboard', orders: 'Захиалгууд', settings: 'Тохиргоо' };
+  var titles = { dashboard: 'Dashboard', orders: 'Захиалгууд', reviews: 'Сэтгэгдэл', settings: 'Тохиргоо' };
   document.getElementById('pageTitle').textContent = titles[name] || name;
   if (name === 'orders') loadOrders();
+  if (name === 'reviews') loadAllReviews();
 }
 
 // API helper
@@ -505,6 +525,43 @@ async function changePw() {
   if (p1 !== p2) { msg.textContent = 'Нууц үг таарахгүй байна'; return; }
   msg.textContent = 'Хадгалагдлаа. Server дахин эхлүүлсний дараа .env файлд ADMIN_PASSWORD=' + p1 + ' тавина уу.';
   toast('Тохиргоо хадгалагдлаа');
+}
+
+// ---- Сэтгэгдэл ----
+async function loadAllReviews() {
+  var el = document.getElementById('reviewsAdminList');
+  el.innerHTML = '<p style="color:var(--sv);font-size:12px">Ачааллаж байна...</p>';
+  try {
+    var list = await api('/api/reviews');
+    if (!list.length) {
+      el.innerHTML = '<p style="color:var(--sv);font-size:12px">Сэтгэгдэл байхгүй байна.</p>';
+      return;
+    }
+    el.innerHTML = list.map(function(rv) {
+      var stars = '★'.repeat(rv.rating) + '☆'.repeat(5 - rv.rating);
+      var date = fmtDate(rv.created_at);
+      var visible = rv.rating >= 4;
+      return '<div style="background:#fff;border:.5px solid var(--g);padding:1.2rem 1.5rem;margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">'
+        + '<div style="flex:1">'
+        + '<div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.4rem">'
+        + '<span style="color:#c8a96e;font-size:15px;letter-spacing:2px">' + stars + '</span>'
+        + '<span style="font-size:9px;letter-spacing:1px;color:var(--sv);text-transform:uppercase">' + date + '</span>'
+        + (visible
+            ? '<span style="font-size:8px;background:#e8f5e9;color:#2e7d32;padding:2px 8px;letter-spacing:1px;font-weight:600">● ВЭБ ДЭЭР ХАРАГДАНА</span>'
+            : '<span style="font-size:8px;background:#fce4ec;color:#c62828;padding:2px 8px;letter-spacing:1px">○ НУУГДСАН</span>')
+        + '</div>'
+        + '<p style="font-size:13px;font-weight:600;margin-bottom:.3rem">' + esc(rv.name) + '</p>'
+        + '<p style="font-size:12px;color:var(--md);line-height:1.7">' + esc(rv.comment) + '</p>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<p style="color:var(--red);font-size:12px">Алдаа: ' + e.message + '</p>';
+  }
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 async function exportCSV() {

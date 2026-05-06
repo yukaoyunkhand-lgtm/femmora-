@@ -97,22 +97,26 @@ async function safeJson(r){
   catch(e){ throw new Error('Серверийн алдаа. Дахин оролдоно уу.'); }
 }
 
-// ---- Сэтгэгдэл ачаалах ----
+// ---- Сэтгэгдэл ачаалах (4-5 од = нийтэд харагдана) ----
 async function loadReviews(){
   try{
     var r=await fetch('/api/reviews');
     var list=await safeJson(r);
+    // Зөвхөн 4 ба 5 одтой сэтгэгдэл харуулна
+    var good=list.filter(function(rv){ return rv.rating>=4; });
     var container=document.getElementById('reviewsList');
-    if(!list.length){
-      container.innerHTML='<div style="text-align:center;color:var(--md);font-size:12px;padding:2rem;grid-column:1/-1">'
-        +{ko:'아직 리뷰가 없습니다. 첫 번째 리뷰를 남겨주세요!',mn:'Одоогоор сэтгэгдэл байхгүй. Анхны сэтгэгдэлээ үлдээгээрэй!',en:'No reviews yet. Be the first to leave one!'}[currentLang]
-        +'</div>';
+    if(!good.length){
+      container.innerHTML='<div style="text-align:center;color:var(--md);font-size:12px;padding:2rem;grid-column:1/-1" class="t" data-mn="Одоогоор сэтгэгдэл байхгүй. Анхны сэтгэгдэлээ үлдээгээрэй!" data-ko="아직 리뷰가 없습니다. 첫 번째 리뷰를 남겨주세요!" data-en="No reviews yet. Be the first to leave one!">Одоогоор сэтгэгдэл байхгүй. Анхны сэтгэгдэлээ үлдээгээрэй!</div>';
       return;
     }
-    container.innerHTML=list.map(function(rv){
+    container.innerHTML=good.map(function(rv){
       var stars='★'.repeat(rv.rating)+'☆'.repeat(5-rv.rating);
-      var date=new Date(rv.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
-      return '<div class="review-card"><p class="review-stars">'+stars+'</p><p class="review-name">'+esc(rv.name)+' · '+date+'</p><p class="review-comment">'+esc(rv.comment)+'</p></div>';
+      var date=new Date(rv.created_at).toLocaleDateString('mn-MN',{year:'numeric',month:'long',day:'numeric'});
+      return '<div class="review-card">'
+        +'<p class="review-stars">'+stars+'</p>'
+        +'<p class="review-name">'+esc(rv.name)+' · '+date+'</p>'
+        +'<p class="review-comment">'+esc(rv.comment)+'</p>'
+        +'</div>';
     }).join('');
   } catch(e){
     document.getElementById('reviewsList').innerHTML='';
