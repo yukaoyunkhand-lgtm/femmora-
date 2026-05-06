@@ -92,9 +92,18 @@ function setRating(v){
 
 // ---- JSON-г аюулгүй уншина ----
 async function safeJson(r){
-  var text=await r.text();
+  var text='';
+  try{ text=await r.text(); }
+  catch(e){ throw new Error('Сүлжээний алдаа. Интернэт холболтоо шалгана уу.'); }
+  // BOM болон whitespace цэвэрлэнэ
+  text=text.replace(/^﻿/,'').trim();
+  if(!text) throw new Error('Сервер хариу буцаасангүй ('+r.status+')');
   try{ return JSON.parse(text); }
-  catch(e){ throw new Error('Серверийн алдаа. Дахин оролдоно уу.'); }
+  catch(e){
+    // Vercel / Firebase-ийн тусгай хариунуудыг шалгана
+    if(text.includes('"error"')){ try{ return JSON.parse(text.slice(text.indexOf('{'))); }catch(_){} }
+    throw new Error('Серверийн алдаа ('+r.status+'). Дахин оролдоно уу.');
+  }
 }
 
 // ---- Сэтгэгдэл ачаалах (4-5 од = нийтэд харагдана) ----
