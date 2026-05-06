@@ -218,7 +218,38 @@
     <!-- 03 Shield Protection -->
     <div class="ic">
       <div class="ic-visual ic-visual--gold">
-        <img src="images/shield.avif" alt="Shield Protection" style="width:64px;height:64px;object-fit:contain;filter:sepia(30%) saturate(1.2) hue-rotate(10deg) brightness(1.1)">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" style="width:80px;height:80px">
+          <defs>
+            <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c8a96e"/>
+              <stop offset="100%" stop-color="#a07840"/>
+            </linearGradient>
+            <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f5edcf"/>
+              <stop offset="100%" stop-color="#e8d5a0"/>
+            </linearGradient>
+          </defs>
+          <!-- 방사선 (UV rays) -->
+          <line x1="60" y1="8" x2="60" y2="18" stroke="#c8a96e" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+          <line x1="88" y1="16" x2="82" y2="24" stroke="#c8a96e" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+          <line x1="32" y1="16" x2="38" y2="24" stroke="#c8a96e" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+          <line x1="100" y1="38" x2="91" y2="42" stroke="#c8a96e" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+          <line x1="20" y1="38" x2="29" y2="42" stroke="#c8a96e" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+          <!-- 방패 (shield) -->
+          <path d="M60 28 L88 38 L88 62 Q88 84 60 96 Q32 84 32 62 L32 38 Z"
+                fill="url(#sg2)" stroke="url(#sg)" stroke-width="1.5"/>
+          <!-- 내부 장식선 -->
+          <path d="M60 34 L82 42 L82 63 Q82 80 60 90 Q38 80 38 63 L38 42 Z"
+                fill="none" stroke="#c8a96e" stroke-width=".8" opacity=".4"/>
+          <!-- SPF 텍스트 -->
+          <text x="60" y="60" text-anchor="middle" font-family="Montserrat,sans-serif"
+                font-size="10" font-weight="600" letter-spacing="1.5" fill="#a07840">SPF</text>
+          <text x="60" y="74" text-anchor="middle" font-family="Montserrat,sans-serif"
+                font-size="14" font-weight="700" letter-spacing="-0.5" fill="#a07840">50+</text>
+          <!-- 하단 PA 텍스트 -->
+          <text x="60" y="110" text-anchor="middle" font-family="Montserrat,sans-serif"
+                font-size="8" letter-spacing="2" fill="#c8a96e" opacity=".8">PA++++</text>
+        </svg>
       </div>
       <div class="inum">03</div>
       <p class="inm">Shield Protection</p>
