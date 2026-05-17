@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>femmora — Admin</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAo25MfDQ1VMPhXsrl7rnnS8HXcBhQs9Q0",
+  authDomain:"femmoramn.firebaseapp.com",
+  projectId:"femmoramn",
+  appId:"1:1067329823532:web:e64efff0c96cc54a664289"
+});
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--dk:#2a2420;--md:#6b5f5a;--sp:#f9f5ee;--g:#e2dbd7;--w:#fff;--sv:#c8c4c0;
@@ -141,6 +151,95 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
   text-transform:uppercase;border:none;cursor:pointer;font-family:inherit;font-weight:500;margin-top:.5rem}
 .btn-save:hover{background:var(--md)}
 
+/* DELIVERY PAGE */
+.delivery-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.delivery-card{display:flex;align-items:center;gap:1rem;background:var(--w);padding:1.2rem 1.5rem;border:.5px solid var(--g);position:relative;overflow:hidden}
+.delivery-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.delivery-card.orange::before{background:#f39c12}
+.delivery-card.blue::before{background:var(--blue)}
+.delivery-card.green::before{background:var(--green)}
+.delivery-card-icon{font-size:26px;flex-shrink:0}
+.delivery-card-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sv);margin-bottom:.3rem}
+.delivery-card-val{font-size:24px;font-weight:300;color:var(--dk);letter-spacing:-1px;line-height:1}
+.delivery-card-sub{font-size:10px;color:var(--md);margin-top:.2rem}
+
+.btn-ship{background:#2980b9;color:#fff;border:none;padding:5px 12px;font-size:9px;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:inherit;
+  border-radius:2px;transition:all .15s;white-space:nowrap}
+.btn-ship:hover{background:#1a6fa0}
+.btn-deliver{background:var(--green);color:#fff;border:none;padding:5px 12px;font-size:9px;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:inherit;
+  border-radius:2px;transition:all .15s;white-space:nowrap}
+.btn-deliver:hover{background:#1e8449}
+.btn-assign{background:none;border:.5px solid var(--g);color:var(--md);padding:5px 12px;
+  font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:inherit;
+  transition:all .15s;white-space:nowrap}
+.btn-assign:hover{border-color:var(--dk);color:var(--dk)}
+
+.courier-tag{display:inline-flex;align-items:center;gap:4px;background:#ebf5fb;color:#1a5276;
+  border:.5px solid #85c1e9;padding:2px 8px;font-size:9px;letter-spacing:.5px;border-radius:2px}
+
+/* DELIVERY MODAL */
+#deliveryModal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;
+  display:none;align-items:center;justify-content:center}
+#deliveryModal.open{display:flex}
+.delivery-modal-box{background:var(--w);width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.delivery-modal-head{padding:1.5rem 2rem;border-bottom:.5px solid var(--g);
+  display:flex;justify-content:space-between;align-items:center}
+.delivery-modal-head h3{font-size:13px;font-weight:500;color:var(--dk)}
+.delivery-modal-body{padding:1.5rem 2rem}
+.delivery-modal-info{background:var(--sp);border:.5px solid var(--g);padding:1rem 1.2rem;
+  margin-bottom:1.2rem;font-size:11px;color:var(--md);line-height:1.9}
+.delivery-modal-info strong{color:var(--dk)}
+
+/* CUSTOMERS PAGE */
+.tier-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;font-size:8px;
+  letter-spacing:1.5px;text-transform:uppercase;font-weight:600;border-radius:2px}
+.tier-vip{background:#fdf6e3;color:#b8860b;border:.5px solid #f0d080}
+.tier-regular{background:#eaf5fb;color:#1a5276;border:.5px solid #85c1e9}
+.tier-new{background:#f0f0f0;color:#666;border:.5px solid #ccc}
+
+.customer-link{color:var(--dk);font-weight:500;cursor:pointer;text-decoration:none;
+  border-bottom:.5px solid transparent;transition:border-color .15s}
+.customer-link:hover{border-bottom-color:var(--dk)}
+
+/* CUSTOMER DETAIL DRAWER */
+#customerDrawer{position:fixed;top:0;right:-560px;width:560px;height:100vh;background:var(--w);
+  box-shadow:-4px 0 24px rgba(0,0,0,.12);z-index:500;transition:right .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden}
+#customerDrawer.open{right:0}
+#drawerOverlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:499;
+  display:none;opacity:0;transition:opacity .3s}
+#drawerOverlay.open{display:block;opacity:1}
+
+.drawer-header{padding:1.5rem 2rem;border-bottom:.5px solid var(--g);
+  display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
+.drawer-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--sv);
+  line-height:1;padding:0;transition:color .15s}
+.drawer-close:hover{color:var(--dk)}
+.drawer-scroll{overflow-y:auto;flex:1;padding:1.5rem 2rem}
+
+.drawer-profile-name{font-size:22px;font-weight:300;letter-spacing:.5px;color:var(--dk);margin-bottom:.3rem}
+.drawer-profile-phone{font-size:12px;color:var(--md);letter-spacing:.5px}
+.drawer-profile-email{font-size:11px;color:var(--sv);margin-top:.2rem}
+
+.drawer-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:1.2rem 0 1.5rem}
+.drawer-stat{background:var(--sp);padding:1rem 1.2rem;border:.5px solid var(--g)}
+.drawer-stat-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--sv);margin-bottom:.3rem}
+.drawer-stat-val{font-size:18px;font-weight:300;color:var(--dk);letter-spacing:-0.5px}
+.drawer-stat-sub{font-size:9px;color:var(--md);margin-top:.2rem}
+
+.drawer-section-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sv);
+  margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:.5px solid var(--g)}
+
+.drawer-orders-table{width:100%;border-collapse:collapse}
+.drawer-orders-table th{padding:.5rem .7rem;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--sv);text-align:left;background:var(--sp);border-bottom:.5px solid var(--g)}
+.drawer-orders-table td{padding:.7rem .7rem;font-size:11px;color:var(--md);
+  border-bottom:.5px solid rgba(226,219,215,.4)}
+.drawer-orders-table tr:last-child td{border-bottom:none}
+.drawer-orders-table tr:hover td{background:#faf8f5}
+
 @media(max-width:768px){
   .sidebar{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto}
   .main{margin-left:0}
@@ -158,6 +257,7 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
   <div class="login-box">
     <div class="login-logo">femmora</div>
     <div class="login-sub">Admin Panel</div>
+    <input type="email" id="emailInput" placeholder="Имэйл хаяг" onkeydown="if(event.key==='Enter')document.getElementById('pwInput').focus()">
     <input type="password" id="pwInput" placeholder="Нууц үг" onkeydown="if(event.key==='Enter')login()">
     <button class="btn-login" onclick="login()">Нэвтрэх</button>
     <div class="login-err" id="loginErr"></div>
@@ -181,6 +281,15 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
       <div class="nav-item" onclick="showPage('reviews')">
         <span class="nav-icon">★</span> Сэтгэгдэл
       </div>
+      <div class="nav-item" onclick="showPage('b2b')">
+        <span class="nav-icon">🏢</span> B2B
+      </div>
+      <div class="nav-item" onclick="showPage('customers')">
+        <span class="nav-icon">👥</span> Үйлчлүүлэгчид
+      </div>
+      <div class="nav-item" onclick="showPage('delivery')">
+        <span class="nav-icon">🚚</span> Хүргэлт
+      </div>
       <div class="nav-item" onclick="showPage('settings')">
         <span class="nav-icon">◎</span> Тохиргоо
       </div>
@@ -193,7 +302,10 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
   <div class="main">
     <div class="topbar">
       <div class="topbar-title" id="pageTitle">Dashboard</div>
-      <div class="topbar-time" id="topbarTime"></div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div id="topbarEmail" style="font-size:10px;color:var(--sv);letter-spacing:.5px"></div>
+        <div class="topbar-time" id="topbarTime"></div>
+      </div>
     </div>
     <div class="content">
 
@@ -259,6 +371,7 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
               <th>Хэрэглэгч</th>
               <th>Утас</th>
               <th>Тоо</th>
+              <th>Өнгө</th>
               <th>Дүн</th>
               <th>Статус</th>
               <th>Огноо</th>
@@ -274,6 +387,10 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
       <div class="page" id="page-settings">
         <div class="settings-card">
           <h3>Нууц үг солих</h3>
+          <p style="font-size:11px;color:var(--md);margin-bottom:1rem;line-height:1.7">
+            Firebase Authentication ашиглаж байна.<br>
+            Нэвтэрсэн хэрэглэгч: <strong id="settingsEmail">—</strong>
+          </p>
           <div class="field">
             <label>Шинэ нууц үг</label>
             <input type="password" id="newPw" placeholder="Шинэ нууц үг оруулна уу">
@@ -283,7 +400,15 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
             <input type="password" id="newPw2" placeholder="Дахин оруулна уу">
           </div>
           <button class="btn-save" onclick="changePw()">Хадгалах</button>
-          <div id="pwMsg" style="margin-top:.7rem;font-size:11px;color:var(--md)"></div>
+          <div id="pwMsg" style="margin-top:.7rem;font-size:11px"></div>
+        </div>
+
+        <div class="settings-card" style="margin-top:1.5rem">
+          <h3>Email тохиргоо</h3>
+          <p style="font-size:11px;color:var(--md);margin-bottom:1rem;line-height:1.7">Шинэ захиалга, сэтгэгдэл, B2B хүсэлт ирэхэд <strong>${process.env.NOTIFY_EMAIL || 'NOTIFY_EMAIL'}</strong> хаяг руу мэдэгдэл явна.<br>Тохиргоог <code>.env</code> файлаас засна уу.</p>
+          <div style="font-size:10px;color:var(--sv);font-family:monospace;background:var(--sp);padding:8px 12px;border:.5px solid var(--g)">
+            SMTP_HOST · SMTP_PORT · SMTP_USER · SMTP_PASS · NOTIFY_EMAIL
+          </div>
         </div>
 
         <div class="settings-card" style="margin-top:1.5rem">
@@ -303,6 +428,29 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
         </div>
       </div>
 
+      <!-- B2B PAGE -->
+      <div class="page" id="page-b2b">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sv)">Байгууллагын хүсэлтүүд</span>
+            <button class="btn-save" style="margin:0 0 0 auto" onclick="loadB2B()">⟳ Шинэчлэх</button>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Байгууллага</th>
+              <th>Холбоо барих</th>
+              <th>Утас</th>
+              <th>Имэйл</th>
+              <th>Мессеж</th>
+              <th>Статус</th>
+              <th>Огноо</th>
+            </tr></thead>
+            <tbody id="b2bBody"></tbody>
+          </table>
+          <div id="b2bEmpty" class="empty-state" style="display:none">B2B хүсэлт байхгүй байна</div>
+        </div>
+      </div>
+
       <!-- REVIEWS PAGE -->
       <div class="page" id="page-reviews">
         <div style="padding:2rem;max-width:900px">
@@ -319,6 +467,170 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
         </div>
       </div>
 
+      <!-- DELIVERY PAGE -->
+      <div class="page" id="page-delivery">
+        <div class="delivery-stats">
+          <div class="delivery-card orange">
+            <div class="delivery-card-icon">📦</div>
+            <div>
+              <div class="delivery-card-label">Хүргэх захиалга</div>
+              <div class="delivery-card-val" id="dv-waiting">—</div>
+              <div class="delivery-card-sub">Төлөгдсөн, хүргэгдээгүй</div>
+            </div>
+          </div>
+          <div class="delivery-card blue">
+            <div class="delivery-card-icon">🚚</div>
+            <div>
+              <div class="delivery-card-label">Замд явж байна</div>
+              <div class="delivery-card-val" id="dv-shipped">—</div>
+              <div class="delivery-card-sub">Хүргэлтэнд гарсан</div>
+            </div>
+          </div>
+          <div class="delivery-card green">
+            <div class="delivery-card-icon">✓</div>
+            <div>
+              <div class="delivery-card-label">Өнөөдөр хүргэгдсэн</div>
+              <div class="delivery-card-val" id="dv-today">—</div>
+              <div class="delivery-card-sub" id="dv-today-sub">захиалга</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <button class="filter-btn active" onclick="setDeliveryFilter('active',this)">Идэвхтэй</button>
+            <button class="filter-btn" onclick="setDeliveryFilter('paid',this)">📦 Хүргэх (paid)</button>
+            <button class="filter-btn" onclick="setDeliveryFilter('shipped',this)">🚚 Замд</button>
+            <button class="filter-btn" onclick="setDeliveryFilter('delivered',this)">✓ Хүргэгдсэн</button>
+            <button class="filter-btn" onclick="setDeliveryFilter('all',this)">Бүгд</button>
+            <button class="btn-save" style="margin:0 0 0 auto" onclick="loadDelivery()">⟳ Шинэчлэх</button>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Захиалга №</th>
+              <th>Хэрэглэгч</th>
+              <th>Хаяг</th>
+              <th>Дүн</th>
+              <th>Хүргэгч</th>
+              <th>Статус</th>
+              <th>Огноо</th>
+              <th>Үйлдэл</th>
+            </tr></thead>
+            <tbody id="deliveryBody"></tbody>
+          </table>
+          <div id="deliveryEmpty" class="empty-state" style="display:none">Захиалга байхгүй байна</div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS PAGE -->
+      <div class="page" id="page-customers">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <input class="search-input" id="custSearchInput" placeholder="Нэр, утасны дугаар..." oninput="filterCustomers()">
+            <button class="filter-btn active" id="cTierAll" onclick="setCustTier('all',this)">Бүгд</button>
+            <button class="filter-btn" onclick="setCustTier('vip',this)">VIP</button>
+            <button class="filter-btn" onclick="setCustTier('regular',this)">Байнгын</button>
+            <button class="filter-btn" onclick="setCustTier('new',this)">Шинэ</button>
+            <button class="btn-save" style="margin:0 0 0 auto" onclick="loadCustomers()">⟳ Шинэчлэх</button>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Нэр</th>
+              <th>Утас</th>
+              <th>Зэрэглэл</th>
+              <th>Захиалга</th>
+              <th>Нийт зарцуулсан</th>
+              <th>Сүүлийн захиалга</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="customersBody"></tbody>
+          </table>
+          <div id="customersEmpty" class="empty-state" style="display:none">Үйлчлүүлэгч байхгүй байна</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY MODAL -->
+<div id="deliveryModal">
+  <div class="delivery-modal-box">
+    <div class="delivery-modal-head">
+      <h3 id="deliveryModalTitle">Хүргэлтийн мэдээлэл</h3>
+      <button class="drawer-close" onclick="closeDeliveryModal()">✕</button>
+    </div>
+    <div class="delivery-modal-body">
+      <div class="delivery-modal-info" id="deliveryModalInfo"></div>
+      <div class="field">
+        <label>Хүргэгч (Курьерын нэр)</label>
+        <input type="text" id="dm_person" placeholder="Жишээ: Болд, Монгол Экспресс..." autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Хүргэх огноо (тооцоолсон)</label>
+        <input type="date" id="dm_date">
+      </div>
+      <div class="field">
+        <label>Тэмдэглэл</label>
+        <input type="text" id="dm_note" placeholder="Нэмэлт мэдээлэл...">
+      </div>
+      <div style="display:flex;gap:.7rem;margin-top:1.2rem;flex-wrap:wrap">
+        <button class="btn-ship" id="dm_ship_btn" onclick="deliveryAction('shipped')">🚚 Замд явуулах</button>
+        <button class="btn-deliver" id="dm_deliver_btn" onclick="deliveryAction('delivered')">✓ Хүргэгдсэн болгох</button>
+        <button class="btn-assign" onclick="deliveryAction('save')">💾 Мэдээлэл хадгалах</button>
+      </div>
+      <div id="deliveryModalMsg" style="margin-top:.8rem;font-size:11px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOMER DETAIL DRAWER -->
+<div id="drawerOverlay" onclick="closeCustomerDrawer()"></div>
+<div id="customerDrawer">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-profile-name" id="drawerName">—</div>
+      <div class="drawer-profile-phone" id="drawerPhone">—</div>
+      <div class="drawer-profile-email" id="drawerEmail"></div>
+    </div>
+    <button class="drawer-close" onclick="closeCustomerDrawer()">✕</button>
+  </div>
+  <div class="drawer-scroll" id="drawerContent">
+    <div class="drawer-stats">
+      <div class="drawer-stat">
+        <div class="drawer-stat-label">Нийт зарцуулсан</div>
+        <div class="drawer-stat-val" id="drawerSpent">—</div>
+        <div class="drawer-stat-sub">₮</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-label">Захиалгын тоо</div>
+        <div class="drawer-stat-val" id="drawerOrderCount">—</div>
+        <div class="drawer-stat-sub">захиалга</div>
+      </div>
+      <div class="drawer-stat">
+        <div class="drawer-stat-label">Зэрэглэл</div>
+        <div class="drawer-stat-val" id="drawerTier">—</div>
+        <div class="drawer-stat-sub" id="drawerTierSub"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:1.5rem">
+      <div class="drawer-section-title">Захиалгын түүх</div>
+      <table class="drawer-orders-table">
+        <thead><tr>
+          <th>Захиалга №</th><th>Өнгө / Номер</th><th>Тоо</th><th>Дүн</th><th>Статус</th><th>Захиалсан</th><th>Төлсөн</th>
+        </tr></thead>
+        <tbody id="drawerOrdersBody"></tbody>
+      </table>
+      <div id="drawerOrdersEmpty" style="display:none;text-align:center;padding:2rem;font-size:12px;color:var(--sv)">Захиалга байхгүй</div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div class="drawer-section-title">Нэмэлт мэдээлэл</div>
+      <div style="font-size:11px;color:var(--md);line-height:2">
+        <div id="drawerAddressRow" style="display:none">Хаяг: <span id="drawerAddress" style="color:var(--dk)">—</span></div>
+        <div>Анхны захиалга: <span id="drawerFirstOrder" style="color:var(--dk)">—</span></div>
+        <div>Сүүлийн захиалга: <span id="drawerLastOrder" style="color:var(--dk)">—</span></div>
+        <div id="drawerUidRow" style="display:none">Firebase UID: <span id="drawerUid" style="color:var(--dk);font-family:monospace;font-size:10px">—</span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -326,9 +638,11 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
 <div id="toast"></div>
 
 <script>
-var token = localStorage.getItem('fm_admin_token');
+var token = null;
 var currentFilter = 'all';
 var allOrders = [];
+var allCustomers = [];
+var currentCustTier = 'all';
 
 // Clock
 setInterval(function(){
@@ -337,33 +651,45 @@ setInterval(function(){
     d.toLocaleDateString('mn-MN') + ' ' + d.toLocaleTimeString('mn-MN');
 }, 1000);
 
-// Auth check
-if (token) showApp();
+// Firebase Auth state — token автоматаар шинэчлэгдэнэ
+firebase.auth().onIdTokenChanged(async function(user) {
+  if (user) {
+    token = await user.getIdToken();
+    if (document.getElementById('appScreen').style.display !== 'block') showApp();
+  } else {
+    token = null;
+    document.getElementById('appScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+});
 
 async function login() {
-  var pw = document.getElementById('pwInput').value;
-  document.getElementById('loginErr').textContent = '';
+  var email = document.getElementById('emailInput').value.trim();
+  var pw    = document.getElementById('pwInput').value;
+  var err   = document.getElementById('loginErr');
+  err.textContent = '';
+  if (!email || !pw) { err.textContent = 'Имэйл болон нууц үг оруулна уу'; return; }
   try {
-    var r = await api('/api/admin/login', 'POST', { password: pw });
-    token = r.token;
-    localStorage.setItem('fm_admin_token', token);
-    showApp();
+    await firebase.auth().signInWithEmailAndPassword(email, pw);
+    // onIdTokenChanged дуудагдаж showApp() ажиллана
   } catch(e) {
-    document.getElementById('loginErr').textContent = e.message || 'Нэвтрэх боломжгүй';
+    var msg = e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found'
+      ? 'Имэйл эсвэл нууц үг буруу байна'
+      : (e.code === 'auth/too-many-requests' ? 'Хэт олон оролдлого. Түр хүлээнэ үү.' : 'Нэвтрэх боломжгүй: ' + e.message);
+    err.textContent = msg;
   }
 }
 
 function showApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
+  var user = firebase.auth().currentUser;
+  if (user) document.getElementById('topbarEmail').textContent = user.email;
   loadDashboard();
 }
 
 async function logout() {
-  try { await api('/api/admin/logout', 'POST'); } catch(e){}
-  token = null;
-  localStorage.removeItem('fm_admin_token');
-  location.reload();
+  await firebase.auth().signOut();
 }
 
 // Navigation
@@ -372,22 +698,31 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   event.currentTarget.classList.add('active');
-  var titles = { dashboard: 'Dashboard', orders: 'Захиалгууд', reviews: 'Сэтгэгдэл', settings: 'Тохиргоо' };
+  var titles = { dashboard: 'Dashboard', orders: 'Захиалгууд', reviews: 'Сэтгэгдэл', b2b: 'B2B Хүсэлтүүд', customers: 'Үйлчлүүлэгчид', delivery: 'Хүргэлт', settings: 'Тохиргоо' };
   document.getElementById('pageTitle').textContent = titles[name] || name;
   if (name === 'orders') loadOrders();
   if (name === 'reviews') loadAllReviews();
+  if (name === 'b2b') loadB2B();
+  if (name === 'customers') loadCustomers();
+  if (name === 'delivery') loadDelivery();
+  if (name === 'settings') {
+    var u = firebase.auth().currentUser;
+    if (u) document.getElementById('settingsEmail').textContent = u.email;
+  }
 }
 
-// API helper
+// API helper — token хугацаа дуусвал Firebase-аас шинэчлэнэ
 async function api(url, method, body) {
+  var user = firebase.auth().currentUser;
+  if (user) token = await user.getIdToken(true); // force refresh
   var opts = { method: method || 'GET', headers: { 'Content-Type': 'application/json' } };
   if (token) opts.headers['x-admin-token'] = token;
   if (body) opts.body = JSON.stringify(body);
   var r = await fetch(url, opts);
-  if (r.status === 401) {
-    token = null; localStorage.removeItem('fm_admin_token'); location.reload(); return;
-  }
-  var j = await r.json();
+  var j;
+  try { j = await r.json(); } catch(e) { j = {}; }
+  if (r.status === 401) throw new Error('Нэвтрэх хугацаа дууслаа. Дахин нэвтэрнэ үү.');
+  if (r.status === 403) throw new Error('Зөвшөөрөлгүй: ' + (j.error || 'Энэ хаяг admin биш байна.'));
   if (!r.ok) throw new Error(j.error || 'Алдаа гарлаа');
   return j;
 }
@@ -468,10 +803,11 @@ function renderOrders(orders) {
   body.innerHTML = orders.map(function(o) {
     return '<tr>' +
       '<td><span class="order-no">' + o.order_no + '</span></td>' +
-      '<td><span class="customer-name">' + esc(o.name) + '</span>' +
+      '<td><span class="customer-link" onclick="openCustomerDetail(\'' + esc(o.phone) + '\')">' + esc(o.name) + '</span>' +
         '<div class="address">' + esc(o.address) + '</div></td>' +
       '<td>' + esc(o.phone) + '</td>' +
       '<td style="text-align:center">' + o.quantity + '</td>' +
+      '<td style="text-align:center;font-size:10px;font-weight:600;color:#6b5f5a">' + (o.shade || '—') + '</td>' +
       '<td><strong>' + o.amount.toLocaleString() + '₮</strong></td>' +
       '<td><select class="status-select" onchange="updateStatus(\'' + o.order_no + '\',this.value)">' +
         statusOptions(o.status) + '</select></td>' +
@@ -521,10 +857,62 @@ async function changePw() {
   var p1 = document.getElementById('newPw').value;
   var p2 = document.getElementById('newPw2').value;
   var msg = document.getElementById('pwMsg');
+  msg.textContent = '';
   if (!p1) { msg.textContent = 'Нууц үг оруулна уу'; return; }
+  if (p1.length < 6) { msg.textContent = 'Хамгийн багадаа 6 тэмдэгт байх ёстой'; return; }
   if (p1 !== p2) { msg.textContent = 'Нууц үг таарахгүй байна'; return; }
-  msg.textContent = 'Хадгалагдлаа. Server дахин эхлүүлсний дараа .env файлд ADMIN_PASSWORD=' + p1 + ' тавина уу.';
-  toast('Тохиргоо хадгалагдлаа');
+  try {
+    await api('/api/admin/change-password', 'POST', { password: p1 });
+    document.getElementById('newPw').value = '';
+    document.getElementById('newPw2').value = '';
+    msg.style.color = 'var(--green)';
+    msg.textContent = 'Нууц үг амжилттай солигдлоо (server дахин эхлэх хүртэл хүчинтэй).';
+    toast('Нууц үг солигдлоо');
+  } catch(e) {
+    msg.style.color = 'var(--red)';
+    msg.textContent = 'Алдаа: ' + e.message;
+  }
+}
+
+// ---- B2B ----
+var b2bStatuses = { new: 'Шинэ', contacted: 'Холбоо барьсан', closed: 'Хаагдсан' };
+var b2bStatusColors = { new: 'badge-pending', contacted: 'badge-shipped', closed: 'badge-delivered' };
+
+async function loadB2B() {
+  var body = document.getElementById('b2bBody');
+  var empty = document.getElementById('b2bEmpty');
+  body.innerHTML = '<tr><td colspan="7" class="empty-state"><span class="spinner"></span></td></tr>';
+  try {
+    var list = await api('/api/b2b');
+    if (!list.length) {
+      body.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    body.innerHTML = list.map(function(b) {
+      return '<tr>' +
+        '<td><strong style="color:var(--dk)">' + esc(b.company) + '</strong></td>' +
+        '<td>' + esc(b.contact_name) + '</td>' +
+        '<td>' + esc(b.phone) + '</td>' +
+        '<td>' + esc(b.email || '—') + '</td>' +
+        '<td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(b.message || '—') + '</td>' +
+        '<td><select class="status-select" onchange="updateB2BStatus(\'' + b.id + '\',this.value)">' +
+          ['new','contacted','closed'].map(function(s) {
+            return '<option value="'+s+'"'+(b.status===s?' selected':'')+'>'+b2bStatuses[s]+'</option>';
+          }).join('') +
+        '</select></td>' +
+        '<td style="font-size:10px;white-space:nowrap">' + fmtDate(b.created_at) + '</td>' +
+        '</tr>';
+    }).join('');
+  } catch(e) { toast('B2B ачаалах алдаа: ' + e.message, false); }
+}
+
+async function updateB2BStatus(id, status) {
+  try {
+    await api('/api/b2b/' + id, 'PATCH', { status });
+    toast('Статус шинэчлэгдлээ');
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
 }
 
 // ---- Сэтгэгдэл ----
@@ -543,7 +931,7 @@ async function loadAllReviews() {
       var visible = rv.rating >= 4;
       return '<div style="background:#fff;border:.5px solid var(--g);padding:1.2rem 1.5rem;margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">'
         + '<div style="flex:1">'
-        + '<div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.4rem">'
+        + '<div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.4rem;flex-wrap:wrap">'
         + '<span style="color:#c8a96e;font-size:15px;letter-spacing:2px">' + stars + '</span>'
         + '<span style="font-size:9px;letter-spacing:1px;color:var(--sv);text-transform:uppercase">' + date + '</span>'
         + (visible
@@ -553,11 +941,21 @@ async function loadAllReviews() {
         + '<p style="font-size:13px;font-weight:600;margin-bottom:.3rem">' + esc(rv.name) + '</p>'
         + '<p style="font-size:12px;color:var(--md);line-height:1.7">' + esc(rv.comment) + '</p>'
         + '</div>'
+        + '<button class="btn-del" onclick="deleteReview(\'' + rv.id + '\')">✕ Устгах</button>'
         + '</div>';
     }).join('');
   } catch(e) {
     el.innerHTML = '<p style="color:var(--red);font-size:12px">Алдаа: ' + e.message + '</p>';
   }
+}
+
+async function deleteReview(id) {
+  if (!confirm('Энэ сэтгэгдлийг устгах уу?')) return;
+  try {
+    await api('/api/reviews/' + id, 'DELETE');
+    toast('Сэтгэгдэл устгагдлаа');
+    loadAllReviews();
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
 }
 
 function esc(s) {
@@ -580,6 +978,267 @@ async function exportCSV() {
     a.click();
     toast('CSV татагдлаа');
   } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+// ---- DELIVERY ----
+var allDeliveryOrders = [];
+var currentDeliveryFilter = 'active';
+var _deliveryOrderNo = null;
+
+async function loadDelivery() {
+  var body = document.getElementById('deliveryBody');
+  body.innerHTML = '<tr><td colspan="8" class="empty-state"><span class="spinner"></span></td></tr>';
+  try {
+    var orders = await api('/api/admin/orders?status=all');
+    allDeliveryOrders = orders.filter(function(o) {
+      return ['paid','shipped','delivered'].includes(o.status);
+    });
+    _updateDeliveryStats(allDeliveryOrders);
+    renderDelivery();
+  } catch(e) { toast('Хүргэлт ачаалах алдаа: ' + e.message, false); }
+}
+
+function _updateDeliveryStats(orders) {
+  var today = new Date().toISOString().slice(0,10);
+  document.getElementById('dv-waiting').textContent  = orders.filter(function(o){ return o.status==='paid'; }).length;
+  document.getElementById('dv-shipped').textContent  = orders.filter(function(o){ return o.status==='shipped'; }).length;
+  var todayDel = orders.filter(function(o){ return o.status==='delivered' && (o.delivered_at||'').slice(0,10)===today; });
+  document.getElementById('dv-today').textContent    = todayDel.length;
+  document.getElementById('dv-today-sub').textContent= todayDel.length ? todayDel.reduce(function(s,o){return s+o.amount;},0).toLocaleString()+'₮' : 'захиалга';
+}
+
+function renderDelivery() {
+  var body  = document.getElementById('deliveryBody');
+  var empty = document.getElementById('deliveryEmpty');
+  var list  = allDeliveryOrders.filter(function(o) {
+    if (currentDeliveryFilter === 'active')    return o.status === 'paid' || o.status === 'shipped';
+    if (currentDeliveryFilter === 'paid')      return o.status === 'paid';
+    if (currentDeliveryFilter === 'shipped')   return o.status === 'shipped';
+    if (currentDeliveryFilter === 'delivered') return o.status === 'delivered';
+    return true;
+  });
+  if (!list.length) { body.innerHTML = ''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  body.innerHTML = list.map(function(o) {
+    var actions = '';
+    if (o.status === 'paid')
+      actions = '<button class="btn-ship" onclick="openDeliveryModal(\''+o.order_no+'\')">🚚 Замд явуулах</button>';
+    else if (o.status === 'shipped')
+      actions = '<button class="btn-deliver" onclick="openDeliveryModal(\''+o.order_no+'\')">✓ Хүргэгдсэн</button>';
+    else
+      actions = '<button class="btn-assign" onclick="openDeliveryModal(\''+o.order_no+'\')">✎ Дэлгэрэнгүй</button>';
+
+    var courier = o.delivery_person
+      ? '<span class="courier-tag">👤 '+esc(o.delivery_person)+'</span>'
+      : '<span style="color:var(--sv);font-size:10px">—</span>';
+
+    var dateInfo = '';
+    if (o.status==='shipped' && o.shipped_at)   dateInfo = '🚚 '+fmtDate(o.shipped_at);
+    else if (o.status==='delivered' && o.delivered_at) dateInfo = '✓ '+fmtDate(o.delivered_at);
+    else dateInfo = fmtDate(o.created_at);
+
+    return '<tr>'+
+      '<td><span class="order-no">'+o.order_no+'</span></td>'+
+      '<td><span class="customer-link" onclick="openCustomerDetail(\''+esc(o.phone)+'\')">'+esc(o.name)+'</span>'+
+          '<div style="font-size:10px;color:var(--sv);margin-top:2px">'+esc(o.phone)+'</div></td>'+
+      '<td style="max-width:180px"><div style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(o.address)+'</div></td>'+
+      '<td><strong>'+o.amount.toLocaleString()+'₮</strong></td>'+
+      '<td>'+courier+'</td>'+
+      '<td>'+badge(o.status)+'</td>'+
+      '<td style="font-size:10px;white-space:nowrap">'+dateInfo+'</td>'+
+      '<td style="white-space:nowrap">'+actions+'</td>'+
+      '</tr>';
+  }).join('');
+}
+
+function setDeliveryFilter(f, btn) {
+  currentDeliveryFilter = f;
+  document.querySelectorAll('#page-delivery .filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderDelivery();
+}
+
+function openDeliveryModal(order_no) {
+  var o = allDeliveryOrders.find(function(x){ return x.order_no===order_no; });
+  if (!o) return;
+  _deliveryOrderNo = order_no;
+
+  document.getElementById('deliveryModalTitle').textContent = 'Хүргэлт — ' + order_no;
+  document.getElementById('deliveryModalInfo').innerHTML =
+    '<strong>'+esc(o.name)+'</strong> · '+esc(o.phone)+'<br>'+
+    '📍 '+esc(o.address)+'<br>'+
+    '💰 '+o.amount.toLocaleString()+'₮ · '+badge(o.status)+
+    (o.delivery_note ? '<br>📝 '+esc(o.delivery_note) : '');
+
+  document.getElementById('dm_person').value = o.delivery_person || '';
+  document.getElementById('dm_note').value   = o.delivery_note   || '';
+  document.getElementById('dm_date').value   = o.expected_delivery_date || '';
+  document.getElementById('deliveryModalMsg').textContent = '';
+
+  // Статусаас хамааран товчнуудыг харуулна
+  document.getElementById('dm_ship_btn').style.display    = o.status==='paid'    ? '' : 'none';
+  document.getElementById('dm_deliver_btn').style.display = o.status==='shipped' ? '' : 'none';
+
+  document.getElementById('deliveryModal').classList.add('open');
+}
+
+function closeDeliveryModal() {
+  document.getElementById('deliveryModal').classList.remove('open');
+  _deliveryOrderNo = null;
+}
+
+async function deliveryAction(action) {
+  if (!_deliveryOrderNo) return;
+  var msg = document.getElementById('deliveryModalMsg');
+  msg.textContent = '';
+  var body = {
+    delivery_person: document.getElementById('dm_person').value.trim(),
+    delivery_note:   document.getElementById('dm_note').value.trim(),
+    expected_delivery_date: document.getElementById('dm_date').value,
+  };
+  if (action === 'shipped')   body.status = 'shipped';
+  if (action === 'delivered') body.status = 'delivered';
+
+  try {
+    await api('/api/admin/orders/' + _deliveryOrderNo, 'PATCH', body);
+    toast(action==='shipped' ? '🚚 Замд явуулсан' : action==='delivered' ? '✓ Хүргэгдсэн болгов' : '💾 Хадгалагдлаа');
+    closeDeliveryModal();
+    loadDelivery();
+  } catch(e) {
+    msg.style.color = 'var(--red)';
+    msg.textContent = 'Алдаа: ' + e.message;
+  }
+}
+
+// ---- CUSTOMERS ----
+async function loadCustomers() {
+  var body = document.getElementById('customersBody');
+  var empty = document.getElementById('customersEmpty');
+  body.innerHTML = '<tr><td colspan="7" class="empty-state"><span class="spinner"></span></td></tr>';
+  try {
+    allCustomers = await api('/api/admin/customers');
+    renderCustomers(allCustomers);
+  } catch(e) { toast('Үйлчлүүлэгчид ачаалах алдаа: ' + e.message, false); }
+}
+
+function renderCustomers(list) {
+  var body = document.getElementById('customersBody');
+  var empty = document.getElementById('customersEmpty');
+  var q = (document.getElementById('custSearchInput').value || '').toLowerCase();
+  var filtered = list.filter(function(c) {
+    var matchTier = currentCustTier === 'all' || c.tier === currentCustTier;
+    var matchQ = !q || c.name.toLowerCase().includes(q) || c.phone.includes(q);
+    return matchTier && matchQ;
+  });
+  if (!filtered.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  body.innerHTML = filtered.map(function(c) {
+    return '<tr>' +
+      '<td><span class="customer-link" onclick="openCustomerDetail(\'' + esc(c.phone) + '\')">' + esc(c.name) + '</span></td>' +
+      '<td style="font-family:monospace;font-size:11px">' + esc(c.phone) + '</td>' +
+      '<td>' + tierBadge(c.tier) + '</td>' +
+      '<td style="text-align:center;font-weight:600;color:var(--dk)">' + c.order_count + '</td>' +
+      '<td><strong>' + c.total_spent.toLocaleString() + '₮</strong></td>' +
+      '<td style="font-size:10px;white-space:nowrap">' + fmtDate(c.last_order) + '</td>' +
+      '<td><button class="filter-btn" style="padding:4px 12px;font-size:8px" onclick="openCustomerDetail(\'' + esc(c.phone) + '\')">Дэлгэрэнгүй →</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function filterCustomers() { renderCustomers(allCustomers); }
+
+function setCustTier(tier, btn) {
+  currentCustTier = tier;
+  document.querySelectorAll('#page-customers .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderCustomers(allCustomers);
+}
+
+async function openCustomerDetail(phone) {
+  var drawer = document.getElementById('customerDrawer');
+  var overlay = document.getElementById('drawerOverlay');
+  // Show drawer immediately with loading state
+  document.getElementById('drawerName').textContent = phone;
+  document.getElementById('drawerPhone').textContent = '...';
+  document.getElementById('drawerEmail').textContent = '';
+  document.getElementById('drawerSpent').textContent = '...';
+  document.getElementById('drawerOrderCount').textContent = '...';
+  document.getElementById('drawerTier').textContent = '...';
+  document.getElementById('drawerTierSub').textContent = '';
+  document.getElementById('drawerOrdersBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1.5rem"><span class="spinner"></span></td></tr>';
+  document.getElementById('drawerOrdersEmpty').style.display = 'none';
+  document.getElementById('drawerFirstOrder').textContent = '...';
+  document.getElementById('drawerLastOrder').textContent = '...';
+  document.getElementById('drawerUidRow').style.display = 'none';
+  overlay.classList.add('open');
+  drawer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  try {
+    var c = await api('/api/admin/customers/' + encodeURIComponent(phone));
+    document.getElementById('drawerName').textContent = c.name;
+    document.getElementById('drawerPhone').textContent = c.phone;
+    if (c.firebaseUser && c.firebaseUser.email) {
+      document.getElementById('drawerEmail').textContent = '✉ ' + c.firebaseUser.email +
+        (c.firebaseUser.displayName ? '  ·  ' + c.firebaseUser.displayName : '');
+    }
+    document.getElementById('drawerSpent').textContent = c.total_spent.toLocaleString();
+    document.getElementById('drawerOrderCount').textContent = c.order_count;
+    var tierLabels = { vip: 'VIP', regular: 'Байнгын', new: 'Шинэ' };
+    var tierSubs = { vip: '200,000₮+ зарцуулсан', regular: '3+ захиалга', new: 'Шинэ үйлчлүүлэгч' };
+    document.getElementById('drawerTier').innerHTML = tierBadge(c.tier);
+    document.getElementById('drawerTierSub').textContent = tierSubs[c.tier] || '';
+    document.getElementById('drawerFirstOrder').textContent = fmtDate(c.first_order);
+    document.getElementById('drawerLastOrder').textContent = fmtDate(c.last_order);
+    if (c.uid) {
+      document.getElementById('drawerUid').textContent = c.uid;
+      document.getElementById('drawerUidRow').style.display = 'block';
+    }
+    var lastAddr = (c.orders && c.orders[0] && c.orders[0].address) ? c.orders[0].address : '';
+    if (lastAddr) {
+      document.getElementById('drawerAddress').textContent = lastAddr;
+      document.getElementById('drawerAddressRow').style.display = 'block';
+    } else {
+      document.getElementById('drawerAddressRow').style.display = 'none';
+    }
+    var orders = c.orders || [];
+    var ordBody = document.getElementById('drawerOrdersBody');
+    var ordEmpty = document.getElementById('drawerOrdersEmpty');
+    if (!orders.length) {
+      ordBody.innerHTML = '';
+      ordEmpty.style.display = 'block';
+    } else {
+      ordEmpty.style.display = 'none';
+      ordBody.innerHTML = orders.map(function(o) {
+        return '<tr>' +
+          '<td><span class="order-no" style="font-size:10px">' + esc(o.order_no) + '</span></td>' +
+          '<td style="text-align:center;font-size:11px;font-weight:600;color:var(--dk)">' + esc(o.shade || '—') + '</td>' +
+          '<td style="text-align:center">' + o.quantity + '</td>' +
+          '<td><strong>' + o.amount.toLocaleString() + '₮</strong></td>' +
+          '<td>' + badge(o.status) + '</td>' +
+          '<td style="font-size:10px;white-space:nowrap">' + fmtDate(o.created_at) + '</td>' +
+          '<td style="font-size:10px;white-space:nowrap">' + (o.paid_at ? fmtDate(o.paid_at) : '—') + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+  } catch(e) {
+    document.getElementById('drawerPhone').textContent = 'Алдаа: ' + e.message;
+  }
+}
+
+function closeCustomerDrawer() {
+  document.getElementById('customerDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function tierBadge(tier) {
+  var labels = { vip: '★ VIP', regular: 'Байнгын', new: 'Шинэ' };
+  return '<span class="tier-badge tier-' + tier + '">' + (labels[tier] || tier) + '</span>';
 }
 
 // Helpers
