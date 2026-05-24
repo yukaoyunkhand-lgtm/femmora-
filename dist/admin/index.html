@@ -364,6 +364,7 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
             <button class="filter-btn" onclick="setFilter('delivered',this)">Хүргэгдсэн</button>
             <button class="filter-btn" onclick="setFilter('cancelled',this)">Цуцлагдсан</button>
             <button class="btn-save" style="margin-top:0;margin-left:auto" onclick="loadOrders()">⟳ Шинэчлэх</button>
+            <button class="btn-save" style="margin-top:0;background:#27ae60" onclick="exportOrdersCSV()">↓ CSV татах</button>
           </div>
           <table>
             <thead><tr>
@@ -965,18 +966,59 @@ function esc(s) {
 async function exportCSV() {
   try {
     var orders = await api('/api/admin/orders?status=all');
-    var rows = [['Захиалга №','Нэр','Утас','Хаяг','Тоо','Дүн','НӨЭТ','Статус','Огноо','Төлбөрийн огноо']];
+    var rows = [['Захиалга №','Нэр','Утас','Хаяг','Өнгө / Номер','Тоо','Дүн','Статус','Захиалсан огноо','Төлбөрийн огноо']];
     orders.forEach(function(o) {
-      rows.push([o.order_no, o.name, o.phone, o.address, o.quantity, o.amount,
-        o.include_vat ? 'Тийм' : 'Үгүй', o.status, fmtDate(o.created_at), o.paid_at ? fmtDate(o.paid_at) : '']);
+      rows.push([o.order_no, o.name, o.phone, o.address, o.shade||'—', o.quantity, o.amount,
+        o.status, fmtDate(o.created_at), o.paid_at ? fmtDate(o.paid_at) : '']);
     });
-    var csv = '\uFEFF' + rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+    var csv = '﻿' + rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('
+');
     var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'femmora_orders_' + new Date().toISOString().slice(0,10) + '.csv';
     a.click();
     toast('CSV татагдлаа');
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+// Orders хуудсан дээрх CSV — одоогийн харагдаж байгаа захиалгуудыг + өнгөөр хураангуй
+async function exportOrdersCSV() {
+  try {
+    var orders = allOrders;
+    if (!orders || !orders.length) { toast('Татах захиалга байхгүй байна', false); return; }
+
+    var rows = [['Захиалга №','Нэр','Утас','Хаяг','Өнгө / Номер','Тоо (ширхэг)','Дүн (₮)','Статус','Захиалсан','Төлөгдсөн']];
+    orders.forEach(function(o) {
+      var statusMn = {pending:'Хүлээгдэж байна',paid:'Төлөгдсөн',shipped:'Хүргэлтэнд',delivered:'Хүргэгдсэн',cancelled:'Цуцлагдсан'}[o.status]||o.status;
+      rows.push([o.order_no, o.name, o.phone, o.address, o.shade||'—', o.quantity, o.amount, statusMn, fmtDate(o.created_at), o.paid_at?fmtDate(o.paid_at):'—']);
+    });
+
+    rows.push([],['=== ӨНГӨӨР НЭГТГЭСЭН ХУРААНГУЙ ===']);
+    rows.push(['Өнгө / Номер','Нийт захиалга','Нийт ширхэг','Нийт дүн (₮)']);
+    var shadeMap = {};
+    orders.forEach(function(o) {
+      var s = o.shade||'—';
+      if (!shadeMap[s]) shadeMap[s] = {count:0, qty:0, total:0};
+      shadeMap[s].count++;
+      shadeMap[s].qty += Number(o.quantity)||0;
+      shadeMap[s].total += Number(o.amount)||0;
+    });
+    Object.keys(shadeMap).sort().forEach(function(s) {
+      var d = shadeMap[s];
+      rows.push([s, d.count, d.qty, d.total]);
+    });
+
+    var csv = '﻿' + rows.map(function(r){
+      return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(',');
+    }).join('
+');
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'femmora_захиалга_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    toast('CSV татагдлаа — ' + orders.length + ' захиалга');
   } catch(e) { toast('Алдаа: ' + e.message, false); }
 }
 
