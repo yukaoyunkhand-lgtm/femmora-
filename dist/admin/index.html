@@ -364,7 +364,14 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
             <button class="filter-btn" onclick="setFilter('delivered',this)">Хүргэгдсэн</button>
             <button class="filter-btn" onclick="setFilter('cancelled',this)">Цуцлагдсан</button>
             <button class="btn-save" style="margin-top:0;margin-left:auto" onclick="loadOrders()">⟳ Шинэчлэх</button>
-            <button class="btn-save" style="margin-top:0;background:#27ae60" onclick="exportOrdersCSV()">↓ CSV татах</button>
+          </div>
+          <div class="table-toolbar" style="background:#faf8f5;border-top:none;gap:.5rem;flex-wrap:wrap;align-items:center">
+            <span style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sv)">CSV татах хугацаа:</span>
+            <input type="date" id="csvDateFrom" class="search-input" style="width:140px;padding:5px 10px;font-size:11px" title="Эхний огноо">
+            <span style="font-size:11px;color:var(--sv)">—</span>
+            <input type="date" id="csvDateTo" class="search-input" style="width:140px;padding:5px 10px;font-size:11px" title="Сүүлийн огноо">
+            <button class="btn-save" style="margin:0;background:#27ae60;font-size:9px;padding:7px 16px" onclick="exportOrdersCSV()">↓ CSV татах</button>
+            <button class="filter-btn" style="font-size:9px;padding:5px 10px" onclick="document.getElementById('csvDateFrom').value='';document.getElementById('csvDateTo').value=''">✕ Цэвэрлэх</button>
           </div>
           <table>
             <thead><tr>
@@ -981,11 +988,17 @@ async function exportCSV() {
   } catch(e) { toast('Алдаа: ' + e.message, false); }
 }
 
-// Orders хуудсан дээрх CSV — одоогийн харагдаж байгаа захиалгуудыг + өнгөөр хураангуй
+// Orders хуудсан дээрх CSV — огноогоор шүүж + өнгөөр хураангуй
 async function exportOrdersCSV() {
   try {
+    var from = document.getElementById('csvDateFrom').value;
+    var to   = document.getElementById('csvDateTo').value;
     var orders = allOrders;
     if (!orders || !orders.length) { toast('Татах захиалга байхгүй байна', false); return; }
+    // Огнооны filter
+    if (from) orders = orders.filter(function(o){ return (o.created_at||'') >= from; });
+    if (to)   orders = orders.filter(function(o){ return (o.created_at||'').slice(0,10) <= to; });
+    if (!orders.length) { toast('Тухайн хугацаанд захиалга байхгүй', false); return; }
 
     var rows = [['Захиалга №','Нэр','Утас','Хаяг','Өнгө / Номер','Тоо (ширхэг)','Дүн (₮)','Статус','Захиалсан','Төлөгдсөн']];
     orders.forEach(function(o) {
