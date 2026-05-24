@@ -971,8 +971,7 @@ async function exportCSV() {
       rows.push([o.order_no, o.name, o.phone, o.address, o.shade||'—', o.quantity, o.amount,
         o.status, fmtDate(o.created_at), o.paid_at ? fmtDate(o.paid_at) : '']);
     });
-    var csv = '﻿' + rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('
-');
+    var csv = '\uFEFF' + rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
     var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -1009,10 +1008,9 @@ async function exportOrdersCSV() {
       rows.push([s, d.count, d.qty, d.total]);
     });
 
-    var csv = '﻿' + rows.map(function(r){
+    var csv = '\uFEFF' + rows.map(function(r){
       return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(',');
-    }).join('
-');
+    }).join('\n');
     var blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
