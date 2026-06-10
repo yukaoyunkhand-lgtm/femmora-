@@ -364,6 +364,7 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
             <button class="filter-btn" onclick="setFilter('delivered',this)">Хүргэгдсэн</button>
             <button class="filter-btn" onclick="setFilter('cancelled',this)">Цуцлагдсан</button>
             <button class="btn-save" style="margin-top:0;margin-left:auto" onclick="loadOrders()">⟳ Шинэчлэх</button>
+            <button class="btn-save" style="margin-top:0;background:#e67e22" onclick="remindAll()">📧 Бүгдэд сануулга</button>
           </div>
           <div class="table-toolbar" style="background:#faf8f5;border-top:none;gap:.5rem;flex-wrap:wrap;align-items:center">
             <span style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sv)">CSV татах хугацаа:</span>
@@ -820,7 +821,10 @@ function renderOrders(orders) {
       '<td><select class="status-select" onchange="updateStatus(\'' + o.order_no + '\',this.value)">' +
         statusOptions(o.status) + '</select></td>' +
       '<td style="font-size:10px;white-space:nowrap">' + fmtDate(o.created_at) + '</td>' +
-      '<td><button class="btn-del" onclick="deleteOrder(\'' + o.order_no + '\')">✕</button></td>' +
+      '<td style="white-space:nowrap">' +
+        '<button class="btn-del" onclick="deleteOrder(\'' + o.order_no + '\')">✕</button> ' +
+        (o.status === 'pending' ? '<button class="btn-ship" style="font-size:8px;padding:4px 8px;background:#e67e22" onclick="remindOrder(\'' + o.order_no + '\')" title="Имэйл сануулга явуулах">📧</button>' : '') +
+      '</td>' +
       '</tr>';
   }).join('');
 }
@@ -858,6 +862,26 @@ function setFilter(f, btn) {
 
 function filterOrders() {
   loadOrders();
+}
+
+async function remindOrder(order_no) {
+  if (!confirm('📧 ' + order_no + ' захиалга руу имэйл сануулга явуулах уу?')) return;
+  try {
+    var r = await api('/api/admin/orders/' + order_no + '/remind', 'POST');
+    toast('📧 Сануулга явуулагдлаа → ' + r.email);
+    loadOrders();
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+async function remindAll() {
+  var pendingOrders = allOrders.filter(function(o){ return o.status === 'pending'; });
+  if (!pendingOrders.length) { toast('Хүлээгдэж буй захиалга байхгүй', false); return; }
+  if (!confirm('Нийт ' + pendingOrders.length + ' хүлээгдэж буй захиалга руу сануулга явуулах уу?\n(Имэйлгүй захиалгыг алгасна)')) return;
+  try {
+    var r = await api('/api/admin/remind-all', 'POST');
+    toast('📧 ' + r.sent + ' имэйл явуулав · ' + r.skipped + ' алгасав (нийт ' + r.total + ')');
+    loadOrders();
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
 }
 
 // SETTINGS

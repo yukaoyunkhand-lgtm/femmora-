@@ -188,9 +188,11 @@ async function submitOrder(e){
   }
   var btn=document.getElementById('orderSubmitBtn');
   btn.disabled=true; btn.textContent='...';
+  var emailEl=document.getElementById('o_email');
   var data={
     name:document.getElementById('o_name').value.trim(),
     phone:document.getElementById('o_phone').value.trim(),
+    email:emailEl?emailEl.value.trim():'',
     address:document.getElementById('o_address').value.trim(),
     quantity:Number(document.getElementById('o_qty').value),
     shade:shade,

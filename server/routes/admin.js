@@ -1,30 +1,12 @@
 const express = require('express');
-const router = express.Router();
-const db = require('../db');
+const router  = express.Router();
+const admin   = require('firebase-admin');
+const db      = require('../db');
+const requireAuth = require('../middleware/adminAuth');
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'femmora2025';
 const COL = 'orders';
-const sessions = new Set();
 
-function requireAuth(req, res, next) {
-  const token = req.headers['x-admin-token'];
-  if (!token || !sessions.has(token)) return res.status(401).json({ error: 'Нэвтрэх шаардлагатай' });
-  next();
-}
-
-router.post('/login', (req, res) => {
-  if (req.body.password !== ADMIN_PASSWORD)
-    return res.status(401).json({ error: 'Нууц үг буруу' });
-  const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
-  sessions.add(token);
-  res.json({ token });
-});
-
-router.post('/logout', (req, res) => {
-  sessions.delete(req.headers['x-admin-token']);
-  res.json({ success: true });
-});
-
+// Stats
 router.get('/stats', requireAuth, async (req, res) => {
   const snap = await db.collection(COL).get();
   const orders = snap.docs.map(d => d.data());
@@ -39,13 +21,13 @@ router.get('/stats', requireAuth, async (req, res) => {
     daily[d.toISOString().slice(0, 10)] = 0;
   }
   paid.forEach(o => {
-    const day = o.created_at.slice(0, 10);
+    const day = (o.created_at || '').slice(0, 10);
     if (day in daily) daily[day] += o.amount;
   });
 
   res.json({
-    total: orders.length,
-    paid: paid.length,
+    total:     orders.length,
+    paid:      paid.length,
     revenue,
     pending:   orders.filter(o => o.status === 'pending').length,
     shipped:   orders.filter(o => o.status === 'shipped').length,
@@ -54,6 +36,7 @@ router.get('/stats', requireAuth, async (req, res) => {
   });
 });
 
+// Orders list
 router.get('/orders', requireAuth, async (req, res) => {
   const { status, search } = req.query;
   let snap = await db.collection(COL).orderBy('created_at', 'desc').get();
@@ -71,23 +54,155 @@ router.get('/orders', requireAuth, async (req, res) => {
   res.json(orders);
 });
 
+// Update order status + delivery info
 router.patch('/orders/:order_no', requireAuth, async (req, res) => {
-  const { status } = req.body;
+  const { status, delivery_person, delivery_note, expected_delivery_date } = req.body;
   const allowed = ['pending','paid','shipped','delivered','cancelled'];
-  if (!allowed.includes(status)) return res.status(400).json({ error: 'Буруу статус' });
+  if (status && !allowed.includes(status)) return res.status(400).json({ error: 'Буруу статус' });
 
-  const update = { status };
+  const update = {};
+  if (status) update.status = status;
+  if (delivery_person !== undefined) update.delivery_person = delivery_person;
+  if (delivery_note   !== undefined) update.delivery_note   = delivery_note;
+  if (expected_delivery_date !== undefined) update.expected_delivery_date = expected_delivery_date;
+
   if (status === 'paid') {
     const doc = await db.collection(COL).doc(req.params.order_no).get();
-    if (doc.exists && !doc.data().paid_at) update.paid_at = new Date().toISOString();
+    if (doc.exists && !doc.data().paid_at)
+      update.paid_at = new Date().toISOString();
   }
+  if (status === 'shipped') update.shipped_at = new Date().toISOString();
+  if (status === 'delivered') update.delivered_at = new Date().toISOString();
+
   await db.collection(COL).doc(req.params.order_no).update(update);
   res.json({ success: true });
 });
 
+// Delete order
 router.delete('/orders/:order_no', requireAuth, async (req, res) => {
   await db.collection(COL).doc(req.params.order_no).delete();
   res.json({ success: true });
+});
+
+// ── Payment reminder email ────────────────────────────────
+router.post('/orders/:order_no/remind', requireAuth, async (req, res) => {
+  const { sendPaymentReminder } = require('../mailer');
+  const doc = await db.collection(COL).doc(req.params.order_no).get();
+  if (!doc.exists) return res.status(404).json({ error: 'Захиалга олдсонгүй' });
+  const order = doc.data();
+
+  // Имэйл авах: захиалгын email → Firebase Auth email (uid-аар)
+  let email = order.email || null;
+  if (!email && order.uid) {
+    try {
+      const u = await admin.auth().getUser(order.uid);
+      if (u.email) { email = u.email; }
+    } catch(_) {}
+  }
+  if (!email) return res.status(400).json({ error: 'Имэйл хаяг байхгүй байна' });
+
+  const orderWithEmail = { ...order, email };
+  const result = await sendPaymentReminder(orderWithEmail);
+  if (!result.ok) return res.status(500).json({ error: result.reason });
+
+  // Сануулга явуулсан цагийг тэмдэглэнэ
+  await db.collection(COL).doc(req.params.order_no).update({ reminded_at: new Date().toISOString() });
+  res.json({ success: true, email });
+});
+
+// ── Bulk remind (pending бүгдэд) ─────────────────────────
+router.post('/remind-all', requireAuth, async (req, res) => {
+  const { sendPaymentReminder } = require('../mailer');
+  const snap = await db.collection(COL).where('status', '==', 'pending').get();
+  const orders = snap.docs.map(d => d.data());
+  let sent = 0, skipped = 0;
+  for (const order of orders) {
+    let email = order.email || null;
+    if (!email && order.uid) {
+      try { const u = await admin.auth().getUser(order.uid); if (u.email) email = u.email; } catch(_) {}
+    }
+    if (!email) { skipped++; continue; }
+    const result = await sendPaymentReminder({ ...order, email });
+    if (result.ok) {
+      await db.collection(COL).doc(order.order_no).update({ reminded_at: new Date().toISOString() });
+      sent++;
+    } else skipped++;
+  }
+  res.json({ success: true, sent, skipped, total: orders.length });
+});
+
+// ── Customers ────────────────────────────────────────────
+// Захиалгуудаас үйлчлүүлэгчдийг phone-оор бүлэглэнэ
+function buildCustomers(orders) {
+  const map = {};
+  for (const o of orders) {
+    const key = o.phone;
+    if (!map[key]) {
+      map[key] = {
+        phone:       o.phone,
+        name:        o.name,
+        uid:         o.uid || null,
+        orders:      [],
+        total_spent: 0,
+        first_order: o.created_at,
+        last_order:  o.created_at,
+      };
+    }
+    const c = map[key];
+    c.orders.push(o);
+    if (['paid','shipped','delivered'].includes(o.status)) c.total_spent += o.amount;
+    if (o.created_at < c.first_order) c.first_order = o.created_at;
+    if (o.created_at > c.last_order)  { c.last_order = o.created_at; c.name = o.name; }
+  }
+  return Object.values(map).map(c => ({
+    ...c,
+    order_count: c.orders.length,
+    tier: c.total_spent >= 200000 ? 'vip'
+        : c.orders.length >= 3    ? 'regular'
+        : 'new',
+  }));
+}
+
+// GET /api/admin/customers
+router.get('/customers', requireAuth, async (req, res) => {
+  const snap   = await db.collection(COL).orderBy('created_at', 'desc').get();
+  const orders = snap.docs.map(d => d.data());
+  const customers = buildCustomers(orders)
+    .sort((a, b) => b.total_spent - a.total_spent);
+  // orders массивыг хасч жижиг хариу буцаана
+  res.json(customers.map(({ orders: _, ...c }) => c));
+});
+
+// GET /api/admin/customers/:phone
+router.get('/customers/:phone', requireAuth, async (req, res) => {
+  const snap   = await db.collection(COL)
+    .where('phone', '==', req.params.phone).get();
+  const orders = snap.docs.map(d => d.data())
+    .sort((a, b) => (b.created_at || '') > (a.created_at || '') ? 1 : -1);
+  if (!orders.length) return res.status(404).json({ error: 'Үйлчлүүлэгч олдсонгүй' });
+
+  const [customer] = buildCustomers(orders);
+  let firebaseUser = null;
+  if (customer.uid) {
+    try {
+      const u = await admin.auth().getUser(customer.uid);
+      firebaseUser = { email: u.email, photoURL: u.photoURL, displayName: u.displayName };
+    } catch(_) {}
+  }
+  res.json({ ...customer, firebaseUser });
+});
+
+// Change password via Firebase Admin
+router.post('/change-password', requireAuth, async (req, res) => {
+  const { password } = req.body;
+  if (!password || password.length < 6)
+    return res.status(400).json({ error: 'Хамгийн багадаа 6 тэмдэгт байх ёстой' });
+  try {
+    await admin.auth().updateUser(req.adminUid, { password });
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 module.exports = router;
