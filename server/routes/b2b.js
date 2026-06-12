@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const requireAdmin = require('../middleware/adminAuth');
+const { sendB2BNotification } = require('../mailer');
 
 const COL = 'b2b_inquiries';
 
@@ -19,17 +21,27 @@ router.post('/', async (req, res) => {
     created_at: new Date().toISOString(),
   };
   await db.collection(COL).add(doc);
+  sendB2BNotification(doc).catch(() => {});
   res.json({ success: true });
 });
 
 // GET /api/b2b (admin)
-router.get('/', async (req, res) => {
+router.get('/', requireAdmin, async (req, res) => {
   try {
     const snap = await db.collection(COL).orderBy('created_at', 'desc').get();
     res.json(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// PATCH /api/b2b/:id (admin — status шинэчлэх)
+router.patch('/:id', requireAdmin, async (req, res) => {
+  const { status } = req.body;
+  const allowed = ['new', 'contacted', 'closed'];
+  if (!allowed.includes(status)) return res.status(400).json({ error: 'Буруу статус' });
+  await db.collection(COL).doc(req.params.id).update({ status });
+  res.json({ success: true });
 });
 
 module.exports = router;

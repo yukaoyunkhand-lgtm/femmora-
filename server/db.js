@@ -1,35 +1,37 @@
 const admin = require('firebase-admin');
-const path = require('path');
-const fs = require('fs');
+const path  = require('path');
+const fs    = require('fs');
+
+// Firebase Admin SDK — module ачаалагдахад шууд initialize хийнэ
+if (!admin.apps.length) {
+  let credential;
+
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    const raw = process.env.FIREBASE_SERVICE_ACCOUNT.replace(/^﻿/, '').trim();
+    const sa  = JSON.parse(raw);
+    if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, '\n');
+    credential = admin.credential.cert(sa);
+  } else {
+    const keyPath = path.join(__dirname, 'serviceAccountKey.json');
+    if (!fs.existsSync(keyPath)) throw new Error('Firebase credentials олдсонгүй');
+    credential = admin.credential.cert(require(keyPath));
+  }
+
+  admin.initializeApp({
+    credential,
+    projectId:     'femmoramn',
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'femmoramn.appspot.com',
+  });
+}
 
 let _db = null;
 
 function getDb() {
   if (_db) return _db;
-
-  if (!admin.apps.length) {
-    let credential;
-
-    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-      // BOM (﻿) болон тэргүүлэх whitespace-г цэвэрлэнэ
-      const raw = process.env.FIREBASE_SERVICE_ACCOUNT.replace(/^﻿/, '').trim();
-      const sa = JSON.parse(raw);
-      if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, '\n');
-      credential = admin.credential.cert(sa);
-    } else {
-      const keyPath = path.join(__dirname, 'serviceAccountKey.json');
-      if (!fs.existsSync(keyPath)) throw new Error('Firebase credentials олдсонгүй');
-      credential = admin.credential.cert(require(keyPath));
-    }
-
-    admin.initializeApp({ credential, projectId: 'femmoramn' });
-  }
-
   _db = admin.firestore();
   return _db;
 }
 
-// Proxy: db.collection(...) автоматаар getDb() дуудна
 module.exports = new Proxy({}, {
   get(_, prop) {
     const db = getDb();

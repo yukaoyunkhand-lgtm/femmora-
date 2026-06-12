@@ -517,4 +517,29 @@ document.addEventListener('DOMContentLoaded',function(){
   setRating(5);
   setLang('mn');
   loadReviews();
+  _setupLeadCapture();
 });
+
+// ---- Lead capture: маягтад имэйл бичингүүт хадгална ----
+var _leadSent = '';
+function _setupLeadCapture(){
+  var emailEl = document.getElementById('o_email');
+  if(!emailEl) return;
+  emailEl.addEventListener('blur', function(){
+    var email = emailEl.value.trim();
+    if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+    if(email === _leadSent) return; // давхар илгээхгүй
+    _leadSent = email;
+    var nameEl  = document.getElementById('o_name');
+    var phoneEl = document.getElementById('o_phone');
+    fetch('/api/leads',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        email: email,
+        name:  nameEl  ? nameEl.value.trim()  : '',
+        phone: phoneEl ? phoneEl.value.trim() : ''
+      })
+    }).catch(function(){});
+  });
+}

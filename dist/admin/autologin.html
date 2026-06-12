@@ -1,17 +1,3 @@
 <!DOCTYPE html>
-<html><head><meta charset='UTF-8'><title>Femmora Login</title>
-<script src='https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js'></script>
-<script src='https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js'></script>
-</head><body style='background:#111;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0'>
-<div style='text-align:center'>
-<p id='msg' style='font-size:16px'>Нэвтэрч байна...</p>
-</div>
-<script>
-firebase.initializeApp({apiKey:'AIzaSyAo25MfDQ1VMPhXsrl7rnnS8HXcBhQs9Q0',authDomain:'femmoramn.firebaseapp.com',projectId:'femmoramn',appId:'1:1067329823532:web:e64efff0c96cc54a664289'});
-firebase.auth().signInWithCustomToken('eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTc3OTYwOTczMywiZXhwIjoxNzc5NjEzMzMzLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BmZW1tb3JhbW4uaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BmZW1tb3JhbW4uaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJ1aWQiOiJmaG5XTVFaWTc0VjRyY0tBNEZnVmc5MXNGV04yIn0.ESAxQsdf7QnwH0Y5Rx78wCAqakrNFE5zf1mvZG-Lq692NRL8RIVESi2Ojh2ywBv0foz7947CE0Qkqi7p_9Uf4uALX54zE5KR56t7jJTbPpcHJDYzNsecwUkYcOrmtA5RXcZgKNgLjp9a8LqzSNoj8dHEMEFpk1BxaF229_OyKt1nVlbYijZEpyLmUrG6a0bSnfCN8xjV4zmq1ltAIN9i0EUfCaXm-4KjyxOfL0LTfB7znPgmcCU3Q880sVRBsFqQuHmaxig8IRTCQhCKmUWFbwyCjhYzS37WordkKZQWrLBotuGdUXYTJ-ZDIN0EnWaY66xNPqh_nL1vjSz8zD0h7A')
-  .then(function(){ 
-    document.getElementById('msg').textContent = 'Амжилттай! Шилжиж байна...';
-    setTimeout(function(){ window.location.href = '/admin/'; }, 1000);
-  })
-  .catch(function(e){ document.getElementById('msg').textContent = 'Алдаа: ' + e.message; });
-</script></body></html>
+<html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0;url=/admin/"><title>Femmora</title></head>
+<body></body></html>

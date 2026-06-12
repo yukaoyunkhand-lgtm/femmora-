@@ -9,7 +9,8 @@ const PORT = process.env.PORT || 3000;
 const ROOT = path.join(__dirname, '..');
 
 app.use(cors());
-app.use(express.json({ strict: false }));
+app.use(express.json({ strict: false, limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Frontend статик файлуудыг serve хийх
 app.use(express.static(path.join(ROOT, 'dist')));
@@ -22,6 +23,8 @@ try {
   app.use('/api/my-orders', require('./routes/myorders'));
   app.use('/api/reviews',   require('./routes/reviews'));
   app.use('/api/b2b',       require('./routes/b2b'));
+  app.use('/api/leads',     require('./routes/leads'));
+  app.use('/api/cron',      require('./routes/cron'));
 } catch (e) {
   console.error('Route load error:', e.message);
   app.use('/api', (_, res) => res.status(500).json({ error: e.message }));

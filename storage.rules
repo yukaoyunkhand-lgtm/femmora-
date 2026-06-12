@@ -1,0 +1,14 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Сэтгэгдлийн зургууд - бүгд унших боломжтой, зөвхөн сервер бичих
+    match /reviews/{file} {
+      allow read: if true;
+      allow write: if false;
+    }
+    // Бусад файлд хандах боломжгүй
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

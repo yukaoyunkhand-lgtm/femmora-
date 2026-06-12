@@ -11,6 +11,14 @@ function getTransport() {
   });
 }
 
+// Resend helper — used when RESEND_API_KEY is set
+async function sendViaResend({ from, to, subject, html }) {
+  const { Resend } = require('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const { error } = await resend.emails.send({ from, to, subject, html });
+  if (error) throw new Error(error.message || JSON.stringify(error));
+}
+
 async function sendOrderNotification(order) {
   const transport = getTransport();
   if (!transport) return;
@@ -91,53 +99,110 @@ async function sendReviewNotification(review) {
 }
 
 async function sendPaymentReminder(order) {
-  const transport = getTransport();
-  if (!transport) return { ok: false, reason: 'SMTP тохиргоо байхгүй' };
-
   const email = order.email || null;
   if (!email) return { ok: false, reason: 'Имэйл хаяг байхгүй' };
 
-  await transport.sendMail({
-    from: `"Femmora Beauty" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: `Таны захиалга — ${order.order_no} төлбөр хүлээгдэж байна`,
-    html: `
-      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#f9f5ee">
-        <div style="text-align:center;margin-bottom:24px">
-          <div style="font-size:22px;font-weight:300;letter-spacing:4px;text-transform:uppercase;color:#2a2420">FEMMORA</div>
-          <div style="font-size:9px;letter-spacing:3px;color:#a09590;text-transform:uppercase;margin-top:4px">Beauty</div>
-        </div>
-        <div style="background:#fff;padding:24px;border:.5px solid #e2dbd7">
-          <p style="font-size:14px;color:#2a2420;margin-bottom:8px">Сайн байна уу, <strong>${order.name}</strong>!</p>
-          <p style="font-size:13px;color:#6b5f5a;line-height:1.8;margin-bottom:20px">
-            Таны <strong>${order.order_no}</strong> дугаартай захиалгын төлбөр хүлээгдэж байна.
-            Захиалгаа баталгаажуулахын тулд төлбөрөө төлнө үү.
-          </p>
-          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px">
-            <tr style="border-bottom:.5px solid #e2dbd7">
-              <td style="padding:8px 0;color:#a09590">Захиалга №</td>
-              <td style="padding:8px 0;font-weight:600;color:#2a2420">${order.order_no}</td>
-            </tr>
-            <tr style="border-bottom:.5px solid #e2dbd7">
-              <td style="padding:8px 0;color:#a09590">Бүтээгдэхүүн</td>
-              <td style="padding:8px 0;color:#2a2420">Silver Edition Air Cushion ${order.shade || ''} × ${order.quantity}</td>
-            </tr>
-            <tr>
-              <td style="padding:8px 0;color:#a09590">Нийт дүн</td>
-              <td style="padding:8px 0;font-weight:600;color:#2a2420;font-size:15px">${Number(order.amount).toLocaleString()}₮</td>
-            </tr>
-          </table>
-          <div style="text-align:center">
-            <a href="https://www.femmorabeauty.mn" style="display:inline-block;background:#2a2420;color:#f9f5ee;padding:12px 32px;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none">Төлбөр төлөх</a>
-          </div>
-        </div>
-        <p style="text-align:center;font-size:10px;color:#c8c4c0;margin-top:20px">
-          Асуух зүйл байвал: info@femmorabeauties.com
-        </p>
+  const fromAddr = '"Femmora Beauty" <info@femmorabeauty.mn>';
+  const subject  = `Таны захиалга — ${order.order_no} төлбөр хүлээгдэж байна`;
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#f9f5ee">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:22px;font-weight:300;letter-spacing:4px;text-transform:uppercase;color:#2a2420">FEMMORA</div>
+        <div style="font-size:9px;letter-spacing:3px;color:#a09590;text-transform:uppercase;margin-top:4px">Beauty</div>
       </div>
-    `,
-  });
-  return { ok: true };
+      <div style="background:#fff;padding:24px;border:.5px solid #e2dbd7">
+        <p style="font-size:14px;color:#2a2420;margin-bottom:8px">Сайн байна уу, <strong>${order.name}</strong>!</p>
+        <p style="font-size:13px;color:#6b5f5a;line-height:1.8;margin-bottom:20px">
+          Таны <strong>${order.order_no}</strong> дугаартай захиалгын төлбөр хүлээгдэж байна.
+          Захиалгаа баталгаажуулахын тулд төлбөрөө төлнө үү.
+        </p>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px">
+          <tr style="border-bottom:.5px solid #e2dbd7">
+            <td style="padding:8px 0;color:#a09590">Захиалга №</td>
+            <td style="padding:8px 0;font-weight:600;color:#2a2420">${order.order_no}</td>
+          </tr>
+          <tr style="border-bottom:.5px solid #e2dbd7">
+            <td style="padding:8px 0;color:#a09590">Бүтээгдэхүүн</td>
+            <td style="padding:8px 0;color:#2a2420">Silver Edition Air Cushion ${order.shade || ''} × ${order.quantity}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#a09590">Нийт дүн</td>
+            <td style="padding:8px 0;font-weight:600;color:#2a2420;font-size:15px">${Number(order.amount).toLocaleString()}₮</td>
+          </tr>
+        </table>
+        <div style="text-align:center">
+          <a href="https://www.femmorabeauty.mn" style="display:inline-block;background:#2a2420;color:#f9f5ee;padding:12px 32px;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none">Төлбөр төлөх</a>
+        </div>
+      </div>
+      <p style="text-align:center;font-size:10px;color:#c8c4c0;margin-top:20px">
+        Асуух зүйл байвал: info@femmorabeauty.mn
+      </p>
+    </div>
+  `;
+
+  try {
+    if (process.env.RESEND_API_KEY) {
+      await sendViaResend({ from: fromAddr, to: email, subject, html });
+    } else {
+      const transport = getTransport();
+      if (!transport) return { ok: false, reason: 'SMTP тохиргоо байхгүй' };
+      await transport.sendMail({ from: `"Femmora Beauty" <${process.env.SMTP_USER}>`, to: email, subject, html });
+    }
+    return { ok: true };
+  } catch (e) {
+    console.error('[mailer] sendPaymentReminder error:', e.message, e);
+    return { ok: false, reason: e.message };
+  }
 }
 
-module.exports = { sendOrderNotification, sendB2BNotification, sendReviewNotification, sendPaymentReminder };
+// Маягт бөглөж эхэлсэн ч захиалга хийгээгүй хүнд follow-up имэйл
+async function sendAbandonedFormEmail(lead) {
+  const email = lead.email || null;
+  if (!email) return { ok: false, reason: 'Имэйл хаяг байхгүй' };
+
+  const fromAddr = '"Femmora Beauty" <info@femmorabeauty.mn>';
+  const subject  = lead.name
+    ? `${lead.name}, таны Silver Cushion таныг хүлээж байна 💝`
+    : 'Таны Silver Cushion таныг хүлээж байна 💝';
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#f9f5ee">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:22px;font-weight:300;letter-spacing:4px;text-transform:uppercase;color:#2a2420">FEMMORA</div>
+        <div style="font-size:9px;letter-spacing:3px;color:#a09590;text-transform:uppercase;margin-top:4px">Beauty</div>
+      </div>
+      <div style="background:#fff;padding:28px 24px;border:.5px solid #e2dbd7">
+        <p style="font-size:14px;color:#2a2420;margin-bottom:8px">Сайн байна уу${lead.name ? ', <strong>' + lead.name + '</strong>' : ''}!</p>
+        <p style="font-size:13px;color:#6b5f5a;line-height:1.8;margin-bottom:16px">
+          Та манай <strong>Silver Edition Air Cushion</strong>-ыг сонирхож байсан байна.
+          Таны гоо сайхны нэг алхам дутуу үлдсэн байна 🌸
+        </p>
+        <p style="font-size:13px;color:#6b5f5a;line-height:1.8;margin-bottom:24px">
+          Захиалгаа дуусгаад 24–48 цагийн дотор хүргэлтээр аваарай.
+          Асуух зүйл байвал бидэнтэй чөлөөтэй холбогдоорой!
+        </p>
+        <div style="text-align:center">
+          <a href="https://www.femmorabeauty.mn/#order" style="display:inline-block;background:#2a2420;color:#f9f5ee;padding:13px 36px;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none">Захиалгаа дуусгах</a>
+        </div>
+      </div>
+      <p style="text-align:center;font-size:10px;color:#c8c4c0;margin-top:20px">
+        Femmora Beauty · www.femmorabeauty.mn
+      </p>
+    </div>
+  `;
+
+  try {
+    if (process.env.RESEND_API_KEY) {
+      await sendViaResend({ from: fromAddr, to: email, subject, html });
+    } else {
+      const transport = getTransport();
+      if (!transport) return { ok: false, reason: 'SMTP тохиргоо байхгүй' };
+      await transport.sendMail({ from: `"Femmora Beauty" <${process.env.SMTP_USER}>`, to: email, subject, html });
+    }
+    return { ok: true };
+  } catch (e) {
+    console.error('[mailer] sendAbandonedFormEmail error:', e.message);
+    return { ok: false, reason: e.message };
+  }
+}
+
+module.exports = { sendOrderNotification, sendB2BNotification, sendReviewNotification, sendPaymentReminder, sendAbandonedFormEmail };

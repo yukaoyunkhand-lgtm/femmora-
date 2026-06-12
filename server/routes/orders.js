@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const { createInvoice } = require('./qpay');
+const { sendOrderNotification } = require('../mailer');
 
-const PRICE_EXCL = 62010;
-const PRICE_INCL = 68900;
+const PRICE_PER_UNIT = 61900;  // НӨАТ хассан нэгж үнэ
+const DELIVERY_FEE  = 7000;   // Хүргэлтийн хөлс (тогтмол)
 const COL = 'orders';
 
 function genOrderNo() {
@@ -16,15 +17,15 @@ function genOrderNo() {
 
 // POST /api/orders
 router.post('/', async (req, res) => {
-  const { name, phone, address, quantity = 1, include_vat = false } = req.body;
+  const { name, phone, address, quantity = 1, shade, email } = req.body;
 
   if (!name || !phone || !address)
     return res.status(400).json({ error: 'Нэр, утас, хаяг заавал шаардлагатай' });
   if (!/^[0-9]{8}$/.test(phone))
     return res.status(400).json({ error: 'Утасны дугаар 8 оронтой байх ёстой' });
 
-  const unitPrice = include_vat ? PRICE_INCL : PRICE_EXCL;
-  const amount = unitPrice * Number(quantity);
+  const qty    = Math.max(1, Math.min(10, Number(quantity)));
+  const amount = PRICE_PER_UNIT * qty + DELIVERY_FEE;
   const order_no = genOrderNo();
 
   const order = {
@@ -32,9 +33,11 @@ router.post('/', async (req, res) => {
     name,
     phone,
     address,
-    quantity: Number(quantity),
-    include_vat: !!include_vat,
-    discount_applied: !include_vat,
+    quantity: qty,
+    shade: shade || null,
+    email: (email || '').trim() || null,
+    unit_price:   PRICE_PER_UNIT,
+    delivery_fee: DELIVERY_FEE,
     amount,
     status: 'pending',
     uid: req.body.uid || null,
@@ -45,6 +48,12 @@ router.post('/', async (req, res) => {
   };
 
   await db.collection(COL).doc(order_no).set(order);
+  sendOrderNotification(order).catch(() => {});
+
+  // Lead-ийг "захиалга хийсэн" болгож тэмдэглэнэ
+  if (order.email) {
+    try { require('./leads').markConverted(order.email); } catch (_) {}
+  }
 
   try {
     const qpay = await createInvoice({ order_no, amount, name });

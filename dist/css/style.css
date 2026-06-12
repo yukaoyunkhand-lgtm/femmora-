@@ -15,7 +15,7 @@ nav{position:fixed;top:30px;left:0;right:0;z-index:150;display:flex;justify-cont
 .ni{font-size:14px;cursor:pointer;color:var(--md)}
 .hero{padding-top:88px;height:100vh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
 .hi{position:relative;overflow:hidden}
-.hi img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.hi img{width:100%;height:100%;object-fit:cover;object-position:center top;background:#eeebe6}
 .ht{display:flex;flex-direction:column;justify-content:center;padding:4rem 3.5rem;background:var(--sp)}
 .ey{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--sv);margin-bottom:1.8rem;font-weight:400}
 h1{font-family:'Montserrat',sans-serif;font-size:44px;font-weight:200;line-height:1.1;color:var(--dk);margin-bottom:1.5rem;letter-spacing:-1px}
@@ -51,7 +51,7 @@ h1 em{font-style:italic;font-weight:300}
 .qpay-btn:hover{background:var(--g)}
 .qpay-icon{width:20px;height:20px;background:var(--dk);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sec{padding:5.5rem 3rem}
-.sl{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--sv);margin-bottom:1.2rem;font-weight:400}
+.sl{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--sv);margin-bottom:1.2rem;font-weight:500}
 h2{font-family:'Montserrat',sans-serif;font-size:30px;font-weight:200;color:var(--dk);line-height:1.1;margin-bottom:1.2rem;letter-spacing:-.5px}
 h2 em{font-style:italic;font-weight:300}
 .editorial{background:var(--w)}

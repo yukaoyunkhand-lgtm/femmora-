@@ -5,6 +5,8 @@ const db      = require('../db');
 const requireAuth = require('../middleware/adminAuth');
 
 const COL = 'orders';
+const CRM = 'customers';
+const DORMANT_DAYS = 60;
 
 // Stats
 router.get('/stats', requireAuth, async (req, res) => {
@@ -91,8 +93,8 @@ router.post('/orders/:order_no/remind', requireAuth, async (req, res) => {
   if (!doc.exists) return res.status(404).json({ error: 'Захиалга олдсонгүй' });
   const order = doc.data();
 
-  // Имэйл авах: захиалгын email → Firebase Auth email (uid-аар)
-  let email = order.email || null;
+  // Admin-аас шууд дамжуулсан имэйл → захиалгын имэйл → Firebase Auth имэйл
+  let email = req.body.email || order.email || null;
   if (!email && order.uid) {
     try {
       const u = await admin.auth().getUser(order.uid);
@@ -100,6 +102,11 @@ router.post('/orders/:order_no/remind', requireAuth, async (req, res) => {
     } catch(_) {}
   }
   if (!email) return res.status(400).json({ error: 'Имэйл хаяг байхгүй байна' });
+
+  // Admin-аас өгсөн имэйлийг захиалганд хадгална
+  if (req.body.email && req.body.email !== order.email) {
+    await db.collection(COL).doc(req.params.order_no).update({ email: req.body.email });
+  }
 
   const orderWithEmail = { ...order, email };
   const result = await sendPaymentReminder(orderWithEmail);
@@ -169,8 +176,13 @@ router.get('/customers', requireAuth, async (req, res) => {
   const orders = snap.docs.map(d => d.data());
   const customers = buildCustomers(orders)
     .sort((a, b) => b.total_spent - a.total_spent);
-  // orders массивыг хасч жижиг хариу буцаана
-  res.json(customers.map(({ orders: _, ...c }) => c));
+  const now = Date.now();
+  res.json(customers.map(({ orders: _, ...c }) => ({
+    ...c,
+    is_dormant: c.last_order
+      ? (now - new Date(c.last_order).getTime()) / 86400000 > DORMANT_DAYS
+      : false,
+  })));
 });
 
 // GET /api/admin/customers/:phone
@@ -189,7 +201,62 @@ router.get('/customers/:phone', requireAuth, async (req, res) => {
       firebaseUser = { email: u.email, photoURL: u.photoURL, displayName: u.displayName };
     } catch(_) {}
   }
-  res.json({ ...customer, firebaseUser });
+  const crmDoc  = await db.collection(CRM).doc(req.params.phone).get();
+  const crmData = crmDoc.exists ? crmDoc.data() : {};
+  res.json({ ...customer, firebaseUser, notes: crmData.notes || [], tags: crmData.tags || [] });
+});
+
+// ── CRM Stats ────────────────────────────────────────────
+router.get('/crm-stats', requireAuth, async (req, res) => {
+  const snap   = await db.collection(COL).orderBy('created_at', 'desc').get();
+  const orders = snap.docs.map(d => d.data());
+  const customers = buildCustomers(orders);
+  const now  = Date.now();
+  const thisMonthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+  res.json({
+    total:         customers.length,
+    vip:           customers.filter(c => c.tier === 'vip').length,
+    dormant:       customers.filter(c => c.last_order && (now - new Date(c.last_order).getTime()) / 86400000 > DORMANT_DAYS).length,
+    new_this_month: customers.filter(c => c.first_order >= thisMonthStart).length,
+  });
+});
+
+// ── Customer Notes ───────────────────────────────────────
+router.post('/customers/:phone/notes', requireAuth, async (req, res) => {
+  const { text } = req.body;
+  if (!text || !text.trim()) return res.status(400).json({ error: 'Тэмдэглэл хоосон байна' });
+  const note = { id: Date.now().toString(), text: text.trim(), created_at: new Date().toISOString(), author: 'admin' };
+  await db.collection(CRM).doc(req.params.phone).set(
+    { notes: admin.firestore.FieldValue.arrayUnion(note) }, { merge: true }
+  );
+  res.json({ success: true, note });
+});
+
+router.delete('/customers/:phone/notes/:id', requireAuth, async (req, res) => {
+  const docRef = db.collection(CRM).doc(req.params.phone);
+  const doc = await docRef.get();
+  if (doc.exists) {
+    const notes = (doc.data().notes || []).filter(n => n.id !== req.params.id);
+    await docRef.update({ notes });
+  }
+  res.json({ success: true });
+});
+
+// ── Customer Tags ────────────────────────────────────────
+router.post('/customers/:phone/tags', requireAuth, async (req, res) => {
+  const { tag } = req.body;
+  if (!tag || !tag.trim()) return res.status(400).json({ error: 'Таг хоосон байна' });
+  await db.collection(CRM).doc(req.params.phone).set(
+    { tags: admin.firestore.FieldValue.arrayUnion(tag.trim()) }, { merge: true }
+  );
+  res.json({ success: true });
+});
+
+router.delete('/customers/:phone/tags/:tag', requireAuth, async (req, res) => {
+  await db.collection(CRM).doc(req.params.phone).set(
+    { tags: admin.firestore.FieldValue.arrayRemove(decodeURIComponent(req.params.tag)) }, { merge: true }
+  );
+  res.json({ success: true });
 });
 
 // Change password via Firebase Admin

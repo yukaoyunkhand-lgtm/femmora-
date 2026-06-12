@@ -203,6 +203,18 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
   border-bottom:.5px solid transparent;transition:border-color .15s}
 .customer-link:hover{border-bottom-color:var(--dk)}
 
+/* CRM */
+.badge-dormant{display:inline-flex;align-items:center;gap:3px;background:#fff3e0;color:#e65100;
+  border:.5px solid #ffb74d;padding:2px 7px;font-size:8px;letter-spacing:1px;font-weight:600;
+  border-radius:2px;margin-left:4px}
+.crm-tag{display:inline-flex;align-items:center;gap:3px;background:#f4ecf7;color:#6c3483;
+  border:.5px solid #bb8fce;padding:2px 9px;font-size:9px;letter-spacing:.5px;border-radius:2px;margin:2px}
+.crm-tag-del{background:none;border:none;color:#9b59b6;cursor:pointer;font-size:11px;
+  padding:0;line-height:1;margin-left:2px;opacity:.7}
+.crm-tag-del:hover{opacity:1;color:#922b21}
+.drawer-section-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--sv);
+  margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:.5px solid var(--g)}
+
 /* CUSTOMER DETAIL DRAWER */
 #customerDrawer{position:fixed;top:0;right:-560px;width:560px;height:100vh;background:var(--w);
   box-shadow:-4px 0 24px rgba(0,0,0,.12);z-index:500;transition:right .3s cubic-bezier(.4,0,.2,1);
@@ -533,6 +545,29 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
 
       <!-- CUSTOMERS PAGE -->
       <div class="page" id="page-customers">
+        <!-- CRM Stats Bar -->
+        <div class="stats-grid" style="margin-bottom:1.5rem;grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card blue">
+            <div class="stat-label">Нийт үйлчлүүлэгч</div>
+            <div class="stat-value" id="crm-total">—</div>
+            <div class="stat-sub">бүртгэгдсэн</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Энэ сард шинэ</div>
+            <div class="stat-value" id="crm-new">—</div>
+            <div class="stat-sub">анхны захиалга</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-label">Идэвхгүй</div>
+            <div class="stat-value" id="crm-dormant">—</div>
+            <div class="stat-sub">60+ хоног захиалгагүй</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-label">VIP</div>
+            <div class="stat-value" id="crm-vip">—</div>
+            <div class="stat-sub">200,000₮+ зарцуулсан</div>
+          </div>
+        </div>
         <div class="table-wrap">
           <div class="table-toolbar">
             <input class="search-input" id="custSearchInput" placeholder="Нэр, утасны дугаар..." oninput="filterCustomers()">
@@ -540,6 +575,7 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
             <button class="filter-btn" onclick="setCustTier('vip',this)">VIP</button>
             <button class="filter-btn" onclick="setCustTier('regular',this)">Байнгын</button>
             <button class="filter-btn" onclick="setCustTier('new',this)">Шинэ</button>
+            <button class="filter-btn" onclick="setCustTier('dormant',this)">⏰ Идэвхгүй</button>
             <button class="btn-save" style="margin:0 0 0 auto" onclick="loadCustomers()">⟳ Шинэчлэх</button>
           </div>
           <table>
@@ -641,6 +677,32 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
         <div id="drawerUidRow" style="display:none">Firebase UID: <span id="drawerUid" style="color:var(--dk);font-family:monospace;font-size:10px">—</span></div>
       </div>
     </div>
+
+    <!-- TAGS -->
+    <div style="margin-bottom:1.5rem">
+      <div class="drawer-section-title">Тагнууд</div>
+      <div id="drawerTagsList" style="margin-bottom:.8rem;min-height:24px"></div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.5rem">
+        <button class="filter-btn" style="font-size:8px;padding:3px 9px" onclick="quickTag('VIP тогтмол')">+ VIP тогтмол</button>
+        <button class="filter-btn" style="font-size:8px;padding:3px 9px" onclick="quickTag('Бэлэг авдаг')">+ Бэлэг авдаг</button>
+        <button class="filter-btn" style="font-size:8px;padding:3px 9px" onclick="quickTag('Асуудалтай')">+ Асуудалтай</button>
+        <button class="filter-btn" style="font-size:8px;padding:3px 9px" onclick="quickTag('Буцаалт')">+ Буцаалт</button>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <input type="text" id="drawerTagInput" class="search-input" style="flex:1;width:auto;font-size:11px" placeholder="Өөр таг нэмэх...">
+        <button class="btn-save" style="margin:0;padding:7px 14px;font-size:9px" onclick="addCustomerTag()">+ Нэмэх</button>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div style="margin-bottom:1.5rem">
+      <div class="drawer-section-title">Тэмдэглэлүүд</div>
+      <div id="drawerNotesList" style="margin-bottom:.8rem"></div>
+      <div style="display:flex;gap:.5rem">
+        <input type="text" id="drawerNoteInput" class="search-input" style="flex:1;width:auto;font-size:11px" placeholder="Тэмдэглэл нэмэх...">
+        <button class="btn-save" style="margin:0;padding:7px 14px;font-size:9px" onclick="addCustomerNote()">+ Нэмэх</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -652,6 +714,7 @@ var currentFilter = 'all';
 var allOrders = [];
 var allCustomers = [];
 var currentCustTier = 'all';
+var _drawerPhone = null;
 
 // Clock
 setInterval(function(){
@@ -712,7 +775,7 @@ function showPage(name) {
   if (name === 'orders') loadOrders();
   if (name === 'reviews') loadAllReviews();
   if (name === 'b2b') loadB2B();
-  if (name === 'customers') loadCustomers();
+  if (name === 'customers') { loadCustomers(); loadCrmStats(); }
   if (name === 'delivery') loadDelivery();
   if (name === 'settings') {
     var u = firebase.auth().currentUser;
@@ -865,9 +928,22 @@ function filterOrders() {
 }
 
 async function remindOrder(order_no) {
-  if (!confirm('📧 ' + order_no + ' захиалга руу имэйл сануулга явуулах уу?')) return;
+  // Захиалгын имэйл хаягийг хайна
+  var order = allOrders.find(function(o){ return o.order_no === order_no; });
+  var existingEmail = (order && order.email) ? order.email : '';
+
+  // Имэйл хаяг байхгүй бол оруулах цонх нээнэ
+  var email = existingEmail;
+  if (!email) {
+    email = prompt('📧 ' + order_no + '\n\nЭнэ захиалганд имэйл хаяг байхгүй байна.\nХүлээн авагчийн имэйл хаягийг оруулна уу:');
+    if (!email || !email.trim()) return;
+    email = email.trim();
+  } else {
+    if (!confirm('📧 ' + order_no + ' захиалга руу имэйл сануулга явуулах уу?\n→ ' + email)) return;
+  }
+
   try {
-    var r = await api('/api/admin/orders/' + order_no + '/remind', 'POST');
+    var r = await api('/api/admin/orders/' + order_no + '/remind', 'POST', { email: email });
     toast('📧 Сануулга явуулагдлаа → ' + r.email);
     loadOrders();
   } catch(e) { toast('Алдаа: ' + e.message, false); }
@@ -1203,7 +1279,7 @@ function renderCustomers(list) {
   var empty = document.getElementById('customersEmpty');
   var q = (document.getElementById('custSearchInput').value || '').toLowerCase();
   var filtered = list.filter(function(c) {
-    var matchTier = currentCustTier === 'all' || c.tier === currentCustTier;
+    var matchTier = currentCustTier === 'all' || c.tier === currentCustTier || (currentCustTier === 'dormant' && c.is_dormant);
     var matchQ = !q || c.name.toLowerCase().includes(q) || c.phone.includes(q);
     return matchTier && matchQ;
   });
@@ -1214,10 +1290,11 @@ function renderCustomers(list) {
   }
   empty.style.display = 'none';
   body.innerHTML = filtered.map(function(c) {
+    var dormantBadge = c.is_dormant ? '<span class="badge-dormant">⏰ 60+</span>' : '';
     return '<tr>' +
       '<td><span class="customer-link" onclick="openCustomerDetail(\'' + esc(c.phone) + '\')">' + esc(c.name) + '</span></td>' +
       '<td style="font-family:monospace;font-size:11px">' + esc(c.phone) + '</td>' +
-      '<td>' + tierBadge(c.tier) + '</td>' +
+      '<td>' + tierBadge(c.tier) + dormantBadge + '</td>' +
       '<td style="text-align:center;font-weight:600;color:var(--dk)">' + c.order_count + '</td>' +
       '<td><strong>' + c.total_spent.toLocaleString() + '₮</strong></td>' +
       '<td style="font-size:10px;white-space:nowrap">' + fmtDate(c.last_order) + '</td>' +
@@ -1236,6 +1313,7 @@ function setCustTier(tier, btn) {
 }
 
 async function openCustomerDetail(phone) {
+  _drawerPhone = phone;
   var drawer = document.getElementById('customerDrawer');
   var overlay = document.getElementById('drawerOverlay');
   // Show drawer immediately with loading state
@@ -1302,15 +1380,114 @@ async function openCustomerDetail(phone) {
           '</tr>';
       }).join('');
     }
+    renderNotes(c.notes || []);
+    renderTags(c.tags || []);
   } catch(e) {
     document.getElementById('drawerPhone').textContent = 'Алдаа: ' + e.message;
   }
 }
 
 function closeCustomerDrawer() {
+  _drawerPhone = null;
   document.getElementById('customerDrawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+// ── CRM Stats ────────────────────────────────────────────
+async function loadCrmStats() {
+  try {
+    var s = await api('/api/admin/crm-stats');
+    document.getElementById('crm-total').textContent   = s.total;
+    document.getElementById('crm-new').textContent     = s.new_this_month;
+    document.getElementById('crm-dormant').textContent = s.dormant;
+    document.getElementById('crm-vip').textContent     = s.vip;
+  } catch(e) {}
+}
+
+// ── Notes ───────────────────────────────────────────────
+function renderNotes(notes) {
+  var el = document.getElementById('drawerNotesList');
+  if (!notes || !notes.length) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--sv);padding:.4rem 0">Тэмдэглэл байхгүй</div>';
+    return;
+  }
+  el.innerHTML = notes.map(function(n) {
+    return '<div style="background:var(--sp);border:.5px solid var(--g);padding:.7rem 1rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">' +
+      '<div><div style="font-size:12px;color:var(--dk);line-height:1.5">' + esc(n.text) + '</div>' +
+      '<div style="font-size:9px;color:var(--sv);margin-top:.3rem;letter-spacing:.5px">' + fmtDate(n.created_at) + '</div></div>' +
+      '<button class="crm-tag-del" style="font-size:13px;flex-shrink:0" onclick="deleteNote(\'' + n.id + '\')">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+async function addCustomerNote() {
+  var input = document.getElementById('drawerNoteInput');
+  var text = input.value.trim();
+  if (!text || !_drawerPhone) return;
+  try {
+    await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone) + '/notes', 'POST', { text: text });
+    input.value = '';
+    var c = await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone));
+    renderNotes(c.notes || []);
+    toast('Тэмдэглэл нэмэгдлээ');
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+async function deleteNote(noteId) {
+  if (!_drawerPhone) return;
+  try {
+    await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone) + '/notes/' + noteId, 'DELETE');
+    var c = await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone));
+    renderNotes(c.notes || []);
+    toast('Тэмдэглэл устгагдлаа');
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+// ── Tags ────────────────────────────────────────────────
+function renderTags(tags) {
+  var el = document.getElementById('drawerTagsList');
+  if (!tags || !tags.length) {
+    el.innerHTML = '<span style="font-size:11px;color:var(--sv)">Таг байхгүй</span>';
+    return;
+  }
+  el.innerHTML = tags.map(function(tag) {
+    return '<span class="crm-tag">' + esc(tag) +
+      '<button class="crm-tag-del" onclick="removeTag(\'' + esc(tag) + '\')">✕</button></span>';
+  }).join('');
+}
+
+async function addCustomerTag() {
+  var input = document.getElementById('drawerTagInput');
+  var tag = input.value.trim();
+  if (!tag || !_drawerPhone) return;
+  try {
+    await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone) + '/tags', 'POST', { tag: tag });
+    input.value = '';
+    var c = await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone));
+    renderTags(c.tags || []);
+    toast('Таг нэмэгдлээ');
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+async function quickTag(tag) {
+  if (!_drawerPhone) return;
+  try {
+    await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone) + '/tags', 'POST', { tag: tag });
+    var c = await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone));
+    renderTags(c.tags || []);
+    toast('Таг нэмэгдлээ: ' + tag);
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+async function removeTag(tag) {
+  if (!_drawerPhone) return;
+  try {
+    await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone) + '/tags/' + encodeURIComponent(tag), 'DELETE');
+    var c = await api('/api/admin/customers/' + encodeURIComponent(_drawerPhone));
+    renderTags(c.tags || []);
+    toast('Таг хасагдлаа');
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
 }
 
 function tierBadge(tier) {
