@@ -302,6 +302,9 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
       <div class="nav-item" onclick="showPage('delivery')">
         <span class="nav-icon">🚚</span> Хүргэлт
       </div>
+      <div class="nav-item" onclick="showPage('wholesale')">
+        <span class="nav-icon">▤</span> Бөөний борлуулалт
+      </div>
       <div class="nav-item" onclick="showPage('settings')">
         <span class="nav-icon">◎</span> Тохиргоо
       </div>
@@ -594,6 +597,80 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
         </div>
       </div>
 
+      <!-- WHOLESALE PAGE -->
+      <div class="page" id="page-wholesale">
+        <div class="stats-grid" style="margin-bottom:1.5rem;grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card blue">
+            <div class="stat-label">Нийт зарагдсан</div>
+            <div class="stat-value" id="ws-units">—</div>
+            <div class="stat-sub" id="ws-units-sub">№21 · №22 · №23</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-label">Нийт авлага</div>
+            <div class="stat-value" id="ws-receivable">—</div>
+            <div class="stat-sub">₮</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Төлөгдсөн</div>
+            <div class="stat-value" id="ws-paid">—</div>
+            <div class="stat-sub">₮</div>
+          </div>
+          <div class="stat-card" style="border-left:3px solid var(--red)">
+            <div class="stat-label">Үлдэгдэл авлага</div>
+            <div class="stat-value" id="ws-outstanding">—</div>
+            <div class="stat-sub">₮</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+          <button class="filter-btn active" id="wsViewSales" onclick="wsSetView('sales')">Борлуулалт</button>
+          <button class="filter-btn" id="wsViewCustomers" onclick="wsSetView('customers')">Харилцагчид</button>
+        </div>
+
+        <!-- Sales view -->
+        <div id="ws-sales-view">
+          <div class="table-wrap">
+            <div class="table-toolbar">
+              <select id="wsCustFilter" style="padding:7px 10px;border:.5px solid var(--g);font-size:11px;font-family:inherit;background:var(--w)" onchange="renderWsSales()">
+                <option value="">Бүх харилцагч</option>
+              </select>
+              <input type="date" id="wsDateFrom" style="padding:7px 10px;border:.5px solid var(--g);font-size:11px;font-family:inherit" onchange="renderWsSales()">
+              <input type="date" id="wsDateTo" style="padding:7px 10px;border:.5px solid var(--g);font-size:11px;font-family:inherit" onchange="renderWsSales()">
+              <button class="filter-btn active" id="wsStatAll" onclick="wsSetStatus('all',this)">Бүгд</button>
+              <button class="filter-btn" onclick="wsSetStatus('unpaid',this)">Төлөгдөөгүй</button>
+              <button class="filter-btn" onclick="wsSetStatus('partial',this)">Хэсэгчлэн</button>
+              <button class="filter-btn" onclick="wsSetStatus('paid',this)">Төлөгдсөн</button>
+              <button class="btn-save" style="margin:0 0 0 auto" onclick="openWsSaleModal()">+ Борлуулалт</button>
+              <button class="btn-save" style="margin:0;background:var(--md)" onclick="exportWsCSV()">↓ CSV</button>
+            </div>
+            <table>
+              <thead><tr>
+                <th>Огноо</th><th>Харилцагч</th><th>№21</th><th>№22</th><th>№23</th><th>Tester</th><th>Нийт</th><th>Дүн</th><th>Төлсөн</th><th>Үлдэгдэл</th><th>Статус</th><th></th>
+              </tr></thead>
+              <tbody id="wsSalesBody"></tbody>
+            </table>
+            <div id="wsSalesEmpty" class="empty-state" style="display:none">Борлуулалтын бүртгэл байхгүй</div>
+          </div>
+        </div>
+
+        <!-- Customers view -->
+        <div id="ws-cust-view" style="display:none">
+          <div class="table-wrap">
+            <div class="table-toolbar">
+              <input class="search-input" id="wsCustSearch" placeholder="Харилцагч хайх..." oninput="renderWsCustomers()">
+              <button class="btn-save" style="margin:0 0 0 auto" onclick="openWsCustModal()">+ Харилцагч</button>
+            </div>
+            <table>
+              <thead><tr>
+                <th>Нэр</th><th>Утас</th><th>Нэгж үнэ</th><th>Нийт авсан</th><th>Нийт дүн</th><th>Төлсөн</th><th>Үлдэгдэл</th><th></th>
+              </tr></thead>
+              <tbody id="wsCustBody"></tbody>
+            </table>
+            <div id="wsCustEmpty" class="empty-state" style="display:none">Харилцагч байхгүй</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -706,6 +783,76 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
   </div>
 </div>
 
+<!-- WHOLESALE SALE MODAL -->
+<div id="wsSaleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center">
+  <div class="delivery-modal-box" style="max-width:480px">
+    <div class="delivery-modal-head">
+      <h3 id="wsSaleModalTitle">Борлуулалт нэмэх</h3>
+      <button class="drawer-close" onclick="closeWsSaleModal()">✕</button>
+    </div>
+    <div class="delivery-modal-body">
+      <div class="field">
+        <label>Харилцагч</label>
+        <select id="ws_sale_cust" style="width:100%;padding:9px 12px;border:.5px solid var(--g);font-size:13px;font-family:inherit;background:var(--w)" onchange="wsOnCustSelect()"></select>
+      </div>
+      <div class="field">
+        <label>Огноо</label>
+        <input type="date" id="ws_sale_date" style="width:100%">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.5rem">
+        <div class="field"><label>№21</label><input type="number" id="ws_sale_q21" min="0" value="0" oninput="wsCalcAmount()"></div>
+        <div class="field"><label>№22</label><input type="number" id="ws_sale_q22" min="0" value="0" oninput="wsCalcAmount()"></div>
+        <div class="field"><label>№23</label><input type="number" id="ws_sale_q23" min="0" value="0" oninput="wsCalcAmount()"></div>
+        <div class="field"><label>Tester</label><input type="number" id="ws_sale_tester" min="0" value="0"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+        <div class="field"><label>Нэгж үнэ (₮)</label><input type="number" id="ws_sale_price" min="0" value="51675" oninput="wsCalcAmount()"></div>
+        <div class="field"><label>Дүн (₮)</label><input type="number" id="ws_sale_amount" min="0" value="0" onfocus="wsAmountTouched=true"></div>
+      </div>
+      <div class="field"><label>Тэмдэглэл</label><input type="text" id="ws_sale_note" placeholder="Нэмэлт мэдээлэл..."></div>
+      <button class="btn-save" style="width:100%;margin-top:.5rem" onclick="saveWsSale()">Хадгалах</button>
+    </div>
+  </div>
+</div>
+
+<!-- WHOLESALE PAYMENT MODAL -->
+<div id="wsPayModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center">
+  <div class="delivery-modal-box" style="max-width:440px">
+    <div class="delivery-modal-head">
+      <h3>Төлбөр бүртгэх</h3>
+      <button class="drawer-close" onclick="closeWsPayModal()">✕</button>
+    </div>
+    <div class="delivery-modal-body">
+      <div id="wsPayInfo" style="font-size:12px;line-height:1.8;margin-bottom:1rem;padding:.8rem;background:var(--sp);border-left:3px solid var(--blue)"></div>
+      <div id="wsPayList" style="margin-bottom:1rem"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+        <div class="field"><label>Огноо</label><input type="date" id="ws_pay_date"></div>
+        <div class="field"><label>Дүн (₮)</label><input type="number" id="ws_pay_amount" min="1"></div>
+      </div>
+      <div class="field"><label>Тэмдэглэл</label><input type="text" id="ws_pay_note" placeholder="Банк, гүйлгээний утга..."></div>
+      <button class="btn-save" style="width:100%;margin-top:.5rem" onclick="addWsPayment()">Төлбөр бүртгэх</button>
+    </div>
+  </div>
+</div>
+
+<!-- WHOLESALE CUSTOMER MODAL -->
+<div id="wsCustModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center">
+  <div class="delivery-modal-box" style="max-width:400px">
+    <div class="delivery-modal-head">
+      <h3 id="wsCustModalTitle">Харилцагч нэмэх</h3>
+      <button class="drawer-close" onclick="closeWsCustModal()">✕</button>
+    </div>
+    <div class="delivery-modal-body">
+      <div class="field"><label>Нэр</label><input type="text" id="ws_cust_name" placeholder="Байгууллага / хүний нэр"></div>
+      <div class="field"><label>Утас</label><input type="text" id="ws_cust_phone" placeholder="Утасны дугаар"></div>
+      <div class="field"><label>Холбоо барих хүн</label><input type="text" id="ws_cust_contact" placeholder="Нэр"></div>
+      <div class="field"><label>Нэгж үнэ (₮)</label><input type="number" id="ws_cust_price" min="0" value="51675"></div>
+      <div class="field"><label>Тэмдэглэл</label><input type="text" id="ws_cust_note" placeholder="Нэмэлт мэдээлэл..."></div>
+      <button class="btn-save" style="width:100%;margin-top:.5rem" onclick="saveWsCust()">Хадгалах</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -770,13 +917,14 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   event.currentTarget.classList.add('active');
-  var titles = { dashboard: 'Dashboard', orders: 'Захиалгууд', reviews: 'Сэтгэгдэл', b2b: 'B2B Хүсэлтүүд', customers: 'Үйлчлүүлэгчид', delivery: 'Хүргэлт', settings: 'Тохиргоо' };
+  var titles = { dashboard: 'Dashboard', orders: 'Захиалгууд', reviews: 'Сэтгэгдэл', b2b: 'B2B Хүсэлтүүд', customers: 'Үйлчлүүлэгчид', delivery: 'Хүргэлт', wholesale: 'Бөөний борлуулалт', settings: 'Тохиргоо' };
   document.getElementById('pageTitle').textContent = titles[name] || name;
   if (name === 'orders') loadOrders();
   if (name === 'reviews') loadAllReviews();
   if (name === 'b2b') loadB2B();
   if (name === 'customers') { loadCustomers(); loadCrmStats(); }
   if (name === 'delivery') loadDelivery();
+  if (name === 'wholesale') loadWholesale();
   if (name === 'settings') {
     var u = firebase.auth().currentUser;
     if (u) document.getElementById('settingsEmail').textContent = u.email;
@@ -1509,6 +1657,267 @@ function fmtDate(s) {
 }
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════ WHOLESALE (Бөөний борлуулалт) ═══════════════
+var wsSales = [], wsCustomers = [], wsStatusFilter = 'all', wsAmountTouched = false, _wsEditSaleId = null, _wsEditCustId = null, _wsPaySaleId = null;
+
+async function loadWholesale() {
+  try {
+    var results = await Promise.all([api('/api/b2b-sales/sales'), api('/api/b2b-sales/customers')]);
+    wsSales = results[0]; wsCustomers = results[1];
+    renderWsSummary(); renderWsSales(); populateWsCustFilter();
+  } catch(e) { toast('Алдаа: ' + e.message, false); }
+}
+
+function fmt(n) { return Number(n||0).toLocaleString('mn-MN'); }
+
+function renderWsSummary() {
+  var t21=0,t22=0,t23=0,tTest=0,tAmt=0,tPaid=0;
+  wsSales.forEach(function(s){t21+=s.qty21||0;t22+=s.qty22||0;t23+=s.qty23||0;tTest+=s.tester||0;tAmt+=s.amount||0;tPaid+=s.paid_total||0;});
+  document.getElementById('ws-units').textContent=fmt(t21+t22+t23)+' ш';
+  document.getElementById('ws-units-sub').textContent='№21: '+fmt(t21)+' · №22: '+fmt(t22)+' · №23: '+fmt(t23)+' · Tester: '+fmt(tTest);
+  document.getElementById('ws-receivable').textContent=fmt(tAmt);
+  document.getElementById('ws-paid').textContent=fmt(tPaid);
+  document.getElementById('ws-outstanding').textContent=fmt(tAmt-tPaid);
+}
+
+function populateWsCustFilter() {
+  var sel=document.getElementById('wsCustFilter');
+  var val=sel.value;
+  sel.innerHTML='<option value="">Бүх харилцагч</option>';
+  wsCustomers.slice().sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(c){
+    sel.innerHTML+='<option value="'+c.id+'">'+esc(c.name)+'</option>';
+  });
+  sel.value=val;
+}
+
+function wsBadge(status) {
+  var map={unpaid:'badge-pending',partial:'badge-shipped',paid:'badge-paid'};
+  var labels={unpaid:'Төлөгдөөгүй',partial:'Хэсэгчлэн',paid:'Төлөгдсөн'};
+  return '<span class="badge '+(map[status]||'')+'">'+(labels[status]||status)+'</span>';
+}
+
+function renderWsSales() {
+  var filtered=wsSales.filter(function(s){
+    if(wsStatusFilter!=='all'&&s.status!==wsStatusFilter) return false;
+    var cf=document.getElementById('wsCustFilter').value;
+    if(cf&&s.customer_id!==cf) return false;
+    var df=document.getElementById('wsDateFrom').value;
+    if(df&&s.date<df) return false;
+    var dt=document.getElementById('wsDateTo').value;
+    if(dt&&s.date>dt) return false;
+    return true;
+  });
+  var body=document.getElementById('wsSalesBody');
+  var empty=document.getElementById('wsSalesEmpty');
+  if(!filtered.length){body.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  body.innerHTML=filtered.map(function(s){
+    return '<tr>'+
+      '<td>'+esc(s.date)+'</td>'+
+      '<td>'+esc(s.customer_name)+'</td>'+
+      '<td>'+(s.qty21||0)+'</td><td>'+(s.qty22||0)+'</td><td>'+(s.qty23||0)+'</td>'+
+      '<td>'+(s.tester||0)+'</td><td>'+(s.total_qty||0)+'</td>'+
+      '<td>'+fmt(s.amount)+'</td><td>'+fmt(s.paid_total)+'</td><td>'+fmt(s.balance)+'</td>'+
+      '<td>'+wsBadge(s.status)+'</td>'+
+      '<td style="white-space:nowrap">'+
+        '<button class="action-btn" title="Засах" onclick="openWsSaleModal(\''+s.id+'\')">✎</button> '+
+        '<button class="action-btn" title="Төлбөр" onclick="openWsPayModal(\''+s.id+'\')">💰</button> '+
+        '<button class="action-btn" title="Устгах" onclick="deleteWsSale(\''+s.id+'\')">✕</button>'+
+      '</td></tr>';
+  }).join('');
+}
+
+function wsSetStatus(st,btn) {
+  wsStatusFilter=st;
+  document.querySelectorAll('#ws-sales-view .table-toolbar .filter-btn').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  renderWsSales();
+}
+
+function wsSetView(view) {
+  document.getElementById('ws-sales-view').style.display=view==='sales'?'block':'none';
+  document.getElementById('ws-cust-view').style.display=view==='customers'?'block':'none';
+  document.getElementById('wsViewSales').classList.toggle('active',view==='sales');
+  document.getElementById('wsViewCustomers').classList.toggle('active',view==='customers');
+  if(view==='customers') renderWsCustomers();
+}
+
+function renderWsCustomers() {
+  var q=(document.getElementById('wsCustSearch').value||'').toLowerCase();
+  var filtered=wsCustomers.filter(function(c){return !q||c.name.toLowerCase().indexOf(q)!==-1||(c.phone||'').indexOf(q)!==-1;});
+  var body=document.getElementById('wsCustBody');
+  var empty=document.getElementById('wsCustEmpty');
+  if(!filtered.length){body.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  body.innerHTML=filtered.map(function(c){
+    var bal=c.balance||0;
+    return '<tr>'+
+      '<td>'+esc(c.name)+'</td>'+
+      '<td>'+esc(c.phone||'—')+'</td>'+
+      '<td>'+fmt(c.unit_price)+'</td>'+
+      '<td>'+fmt(c.total_units)+' ш</td>'+
+      '<td>'+fmt(c.total_amount)+'</td>'+
+      '<td>'+fmt(c.total_paid)+'</td>'+
+      '<td style="color:'+(bal>0?'var(--red)':'var(--green)')+'">'+fmt(bal)+'</td>'+
+      '<td><button class="action-btn" title="Засах" onclick="openWsCustModal(\''+c.id+'\')">✎</button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+// ── Sale Modal ──
+function openWsSaleModal(editId) {
+  _wsEditSaleId=editId||null; wsAmountTouched=false;
+  document.getElementById('wsSaleModalTitle').textContent=editId?'Борлуулалт засах':'Борлуулалт нэмэх';
+  var sel=document.getElementById('ws_sale_cust');
+  sel.innerHTML='<option value="">— Сонгох —</option>';
+  wsCustomers.slice().sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(c){
+    sel.innerHTML+='<option value="'+c.id+'" data-price="'+c.unit_price+'">'+esc(c.name)+'</option>';
+  });
+  if(editId){
+    var s=wsSales.find(function(x){return x.id===editId;});
+    if(s){
+      sel.value=s.customer_id;
+      document.getElementById('ws_sale_date').value=s.date;
+      document.getElementById('ws_sale_q21').value=s.qty21||0;
+      document.getElementById('ws_sale_q22').value=s.qty22||0;
+      document.getElementById('ws_sale_q23').value=s.qty23||0;
+      document.getElementById('ws_sale_tester').value=s.tester||0;
+      document.getElementById('ws_sale_price').value=s.unit_price||51675;
+      document.getElementById('ws_sale_amount').value=s.amount||0;
+      document.getElementById('ws_sale_note').value=s.note||'';
+      wsAmountTouched=true;
+    }
+  } else {
+    document.getElementById('ws_sale_date').value=new Date().toISOString().slice(0,10);
+    document.getElementById('ws_sale_q21').value=0;
+    document.getElementById('ws_sale_q22').value=0;
+    document.getElementById('ws_sale_q23').value=0;
+    document.getElementById('ws_sale_tester').value=0;
+    document.getElementById('ws_sale_price').value=51675;
+    document.getElementById('ws_sale_amount').value=0;
+    document.getElementById('ws_sale_note').value='';
+  }
+  document.getElementById('wsSaleModal').style.display='flex';
+}
+function closeWsSaleModal(){document.getElementById('wsSaleModal').style.display='none';}
+
+function wsOnCustSelect(){
+  var opt=document.getElementById('ws_sale_cust').selectedOptions[0];
+  if(opt&&opt.dataset.price){document.getElementById('ws_sale_price').value=opt.dataset.price;wsCalcAmount();}
+}
+function wsCalcAmount(){
+  if(wsAmountTouched)return;
+  var q=(['ws_sale_q21','ws_sale_q22','ws_sale_q23']).reduce(function(a,id){return a+(Number(document.getElementById(id).value)||0);},0);
+  var p=Number(document.getElementById('ws_sale_price').value)||0;
+  document.getElementById('ws_sale_amount').value=q*p;
+}
+
+async function saveWsSale(){
+  var body={
+    customer_id:document.getElementById('ws_sale_cust').value,
+    date:document.getElementById('ws_sale_date').value,
+    qty21:Number(document.getElementById('ws_sale_q21').value)||0,
+    qty22:Number(document.getElementById('ws_sale_q22').value)||0,
+    qty23:Number(document.getElementById('ws_sale_q23').value)||0,
+    tester:Number(document.getElementById('ws_sale_tester').value)||0,
+    unit_price:Number(document.getElementById('ws_sale_price').value)||51675,
+    amount:Number(document.getElementById('ws_sale_amount').value)||0,
+    note:document.getElementById('ws_sale_note').value
+  };
+  try{
+    if(_wsEditSaleId){await api('/api/b2b-sales/sales/'+_wsEditSaleId,'PATCH',body);toast('Борлуулалт шинэчлэгдлээ');}
+    else{await api('/api/b2b-sales/sales','POST',body);toast('Борлуулалт нэмэгдлээ');}
+    closeWsSaleModal();loadWholesale();
+  }catch(e){toast('Алдаа: '+e.message,false);}
+}
+
+async function deleteWsSale(id){
+  if(!confirm('Энэ борлуулалтыг устгах уу?'))return;
+  try{await api('/api/b2b-sales/sales/'+id,'DELETE');toast('Устгагдлаа');loadWholesale();}
+  catch(e){toast('Алдаа: '+e.message,false);}
+}
+
+// ── Payment Modal ──
+function openWsPayModal(saleId){
+  _wsPaySaleId=saleId;
+  var s=wsSales.find(function(x){return x.id===saleId;});
+  if(!s)return;
+  document.getElementById('wsPayInfo').innerHTML=
+    '<b>'+esc(s.customer_name)+'</b> — '+esc(s.date)+'<br>'+
+    'Дүн: <b>'+fmt(s.amount)+'₮</b> · Төлсөн: <b>'+fmt(s.paid_total)+'₮</b> · Үлдэгдэл: <b style="color:var(--red)">'+fmt(s.balance)+'₮</b>';
+  var plist=(s.payments||[]).map(function(p){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:.5px solid var(--g);font-size:11px">'+
+      '<span>'+esc(p.date)+' — '+fmt(p.amount)+'₮'+(p.note?' ('+esc(p.note)+')':'')+'</span>'+
+      '<button class="action-btn" title="Устгах" onclick="deleteWsPayment(\''+saleId+'\',\''+p.id+'\')">✕</button></div>';
+  }).join('');
+  document.getElementById('wsPayList').innerHTML=plist||'<div style="font-size:11px;color:var(--sv);padding:8px 0">Төлбөр бүртгэгдээгүй</div>';
+  document.getElementById('ws_pay_date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ws_pay_amount').value=Math.max(0,s.balance);
+  document.getElementById('ws_pay_note').value='';
+  document.getElementById('wsPayModal').style.display='flex';
+}
+function closeWsPayModal(){document.getElementById('wsPayModal').style.display='none';}
+
+async function addWsPayment(){
+  var body={date:document.getElementById('ws_pay_date').value,amount:Number(document.getElementById('ws_pay_amount').value)||0,note:document.getElementById('ws_pay_note').value};
+  try{await api('/api/b2b-sales/sales/'+_wsPaySaleId+'/payments','POST',body);toast('Төлбөр бүртгэгдлээ');closeWsPayModal();loadWholesale();}
+  catch(e){toast('Алдаа: '+e.message,false);}
+}
+async function deleteWsPayment(saleId,payId){
+  if(!confirm('Энэ төлбөрийг устгах уу?'))return;
+  try{await api('/api/b2b-sales/sales/'+saleId+'/payments/'+payId,'DELETE');toast('Төлбөр устгагдлаа');closeWsPayModal();loadWholesale();}
+  catch(e){toast('Алдаа: '+e.message,false);}
+}
+
+// ── Customer Modal ──
+function openWsCustModal(editId){
+  _wsEditCustId=editId||null;
+  document.getElementById('wsCustModalTitle').textContent=editId?'Харилцагч засах':'Харилцагч нэмэх';
+  if(editId){
+    var c=wsCustomers.find(function(x){return x.id===editId;});
+    if(c){
+      document.getElementById('ws_cust_name').value=c.name||'';
+      document.getElementById('ws_cust_phone').value=c.phone||'';
+      document.getElementById('ws_cust_contact').value=c.contact||'';
+      document.getElementById('ws_cust_price').value=c.unit_price||51675;
+      document.getElementById('ws_cust_note').value=c.note||'';
+    }
+  } else {
+    document.getElementById('ws_cust_name').value='';
+    document.getElementById('ws_cust_phone').value='';
+    document.getElementById('ws_cust_contact').value='';
+    document.getElementById('ws_cust_price').value=51675;
+    document.getElementById('ws_cust_note').value='';
+  }
+  document.getElementById('wsCustModal').style.display='flex';
+}
+function closeWsCustModal(){document.getElementById('wsCustModal').style.display='none';}
+
+async function saveWsCust(){
+  var body={name:document.getElementById('ws_cust_name').value,phone:document.getElementById('ws_cust_phone').value,contact:document.getElementById('ws_cust_contact').value,unit_price:Number(document.getElementById('ws_cust_price').value)||51675,note:document.getElementById('ws_cust_note').value};
+  try{
+    if(_wsEditCustId){await api('/api/b2b-sales/customers/'+_wsEditCustId,'PATCH',body);toast('Харилцагч шинэчлэгдлээ');}
+    else{await api('/api/b2b-sales/customers','POST',body);toast('Харилцагч нэмэгдлээ');}
+    closeWsCustModal();loadWholesale();
+  }catch(e){toast('Алдаа: '+e.message,false);}
+}
+
+// ── CSV Export ──
+function exportWsCSV(){
+  var rows=[['Огноо','Харилцагч','№21','№22','№23','Tester','Нийт','Нэгж үнэ','Дүн','Төлсөн','Үлдэгдэл','Статус','Тэмдэглэл']];
+  var statusMap={unpaid:'Төлөгдөөгүй',partial:'Хэсэгчлэн төлсөн',paid:'Төлөгдсөн'};
+  wsSales.forEach(function(s){
+    rows.push([s.date,s.customer_name,s.qty21||0,s.qty22||0,s.qty23||0,s.tester||0,s.total_qty||0,s.unit_price||0,s.amount||0,s.paid_total||0,s.balance||0,statusMap[s.status]||s.status,s.note||'']);
+  });
+  var t21=0,t22=0,t23=0,tTest=0,tQty=0,tAmt=0,tPaid=0;
+  wsSales.forEach(function(s){t21+=s.qty21||0;t22+=s.qty22||0;t23+=s.qty23||0;tTest+=s.tester||0;tQty+=s.total_qty||0;tAmt+=s.amount||0;tPaid+=s.paid_total||0;});
+  rows.push([]);
+  rows.push(['НИЙТ','',t21,t22,t23,tTest,tQty,'',tAmt,tPaid,tAmt-tPaid,'','']);
+  var csv='﻿'+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='femmora_b2b_sales_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 </script>
 </body>

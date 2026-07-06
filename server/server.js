@@ -37,6 +37,7 @@ try {
   app.use('/api/my-orders', require('./routes/myorders'));
   app.use('/api/reviews',   require('./routes/reviews'));
   app.use('/api/b2b',       require('./routes/b2b'));
+  app.use('/api/b2b-sales', require('./routes/b2bsales'));
   app.use('/api/leads',     require('./routes/leads'));
   app.use('/api/cron',      require('./routes/cron'));
 } catch (e) {
