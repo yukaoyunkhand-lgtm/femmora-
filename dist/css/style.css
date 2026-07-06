@@ -6,10 +6,10 @@ body{font-family:'Montserrat',sans-serif;background:var(--sp);color:var(--dk);ov
 .lb{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border:.5px solid var(--sv);background:transparent;cursor:pointer;color:var(--md);font-family:'Montserrat',sans-serif;font-weight:400;transition:all .2s}
 .lb.active{background:var(--dk);color:var(--sp);border-color:var(--dk)}
 .lb:first-child{border-right:none}
-nav{position:fixed;top:30px;left:0;right:0;z-index:150;display:flex;justify-content:space-between;align-items:center;padding:.9rem 3rem;background:rgba(249,245,238,.97);backdrop-filter:blur(8px);border-bottom:.5px solid var(--g)}
-.logo{height:24px;width:auto}
-.nl{display:flex;gap:2.5rem;list-style:none}
-.nl a{text-decoration:none;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--md);transition:color .2s;font-weight:500}
+nav{position:fixed;top:30px;left:0;right:0;z-index:150;display:flex;justify-content:space-between;align-items:center;padding:.9rem 2rem;background:rgba(249,245,238,.97);backdrop-filter:blur(8px);border-bottom:.5px solid var(--g)}
+.logo{height:22px;width:auto}
+.nl{display:flex;gap:1.6rem;list-style:none}
+.nl a{text-decoration:none;font-size:8px;letter-spacing:1.8px;text-transform:uppercase;color:var(--md);transition:color .2s;font-weight:500;white-space:nowrap}
 .nl a:hover{color:var(--dk)}
 .nr{display:flex;gap:1.2rem;align-items:center}
 .ni{font-size:14px;cursor:pointer;color:var(--md)}
