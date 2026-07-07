@@ -350,8 +350,25 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
         </div>
 
         <div class="chart-card">
-          <div class="chart-title">7 хоногийн орлого (₮)</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem">
+            <div class="chart-title" style="margin-bottom:0" id="chartTitle">7 хоногийн орлого (₮)</div>
+            <div style="display:flex;gap:0">
+              <button class="filter-btn active" id="btn7" onclick="switchChart('7')" style="padding:4px 12px;font-size:8px">7 хоног</button>
+              <button class="filter-btn" id="btn30" onclick="switchChart('30')" style="padding:4px 12px;font-size:8px;border-left:none">Сарын</button>
+            </div>
+          </div>
           <div class="chart-bars" id="chartBars"></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem">
+          <div class="chart-card" style="margin-bottom:0">
+            <div class="chart-title">Өнгөний борлуулалт</div>
+            <div id="shadeBars" style="display:flex;flex-direction:column;gap:1rem"></div>
+          </div>
+          <div class="chart-card" style="margin-bottom:0">
+            <div class="chart-title">Өнгөний эзлэх хувь</div>
+            <div id="shadePie" style="display:flex;align-items:center;justify-content:center;height:120px;gap:1.5rem"></div>
+          </div>
         </div>
 
         <div class="table-wrap">
@@ -957,31 +974,86 @@ function toast(msg, ok) {
 }
 
 // DASHBOARD
+var _statsCache = null;
 async function loadDashboard() {
   try {
     var s = await api('/api/admin/stats');
+    _statsCache = s;
     document.getElementById('s-revenue').textContent = s.revenue.toLocaleString() + '₮';
     document.getElementById('s-total').textContent = s.total;
     document.getElementById('s-pending-sub').textContent = s.pending + ' хүлээгдэж байна';
     document.getElementById('s-shipped').textContent = s.shipped;
     document.getElementById('s-delivered').textContent = s.delivered;
     drawChart(s.daily);
+    drawShades(s.shades || {});
     loadRecentOrders();
   } catch(e) { toast('Dashboard ачаалах алдаа: ' + e.message, false); }
+}
+
+function switchChart(mode) {
+  if (!_statsCache) return;
+  var btn7 = document.getElementById('btn7');
+  var btn30 = document.getElementById('btn30');
+  var title = document.getElementById('chartTitle');
+  if (mode === '7') {
+    btn7.classList.add('active'); btn30.classList.remove('active');
+    title.textContent = '7 хоногийн орлого (₮)';
+    drawChart(_statsCache.daily);
+  } else {
+    btn30.classList.add('active'); btn7.classList.remove('active');
+    title.textContent = 'Сарын орлого (₮)';
+    drawChart(_statsCache.monthly);
+  }
 }
 
 function drawChart(daily) {
   var entries = Object.entries(daily);
   var max = Math.max(...entries.map(e => e[1]), 1);
-  var html = entries.map(function([day, val]) {
+  var showEvery = entries.length > 10 ? Math.ceil(entries.length / 10) : 1;
+  var html = entries.map(function([day, val], i) {
     var pct = Math.max((val / max) * 100, val > 0 ? 4 : 1);
-    var label = day.slice(5); // MM-DD
+    var label = (i % showEvery === 0 || i === entries.length - 1) ? day.slice(5) : '';
     var dispVal = val > 0 ? (val/1000).toFixed(0) + 'k' : '';
     return '<div class="chart-bar-wrap"><div class="chart-bar-val">' + dispVal +
       '</div><div class="chart-bar" style="height:' + pct + '%"></div>' +
       '<div class="chart-bar-label">' + label + '</div></div>';
   }).join('');
   document.getElementById('chartBars').innerHTML = html;
+}
+
+function drawShades(shades) {
+  var order = ['No.21','No.22','No.23'];
+  var colors = {'No.21':'#f0d9c0','No.22':'#e8c49a','No.23':'#d4a882'};
+  var totalQty = order.reduce(function(s,k){ return s + (shades[k] ? shades[k].qty : 0); }, 0) || 1;
+
+  // Bar chart
+  var barsHtml = order.map(function(k) {
+    var d = shades[k] || {orders:0, qty:0};
+    var pct = Math.round((d.qty / totalQty) * 100);
+    return '<div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">' +
+        '<span style="font-size:11px;font-weight:600;color:var(--dk)">' + k + '</span>' +
+        '<span style="font-size:10px;color:var(--md)">' + d.qty + ' ширхэг · ' + d.orders + ' захиалга</span>' +
+      '</div>' +
+      '<div style="height:8px;background:var(--g);border-radius:2px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + (colors[k]||'#ccc') + ';border-radius:2px;border:.5px solid rgba(0,0,0,.1);transition:width .4s"></div>' +
+      '</div>' +
+      '<div style="font-size:9px;color:var(--sv);margin-top:2px">' + pct + '%</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('shadeBars').innerHTML = barsHtml;
+
+  // Donut-style display
+  var pieHtml = order.map(function(k) {
+    var d = shades[k] || {orders:0, qty:0};
+    var pct = Math.round((d.qty / totalQty) * 100);
+    return '<div style="text-align:center">' +
+      '<div style="width:56px;height:56px;border-radius:50%;background:' + (colors[k]||'#ccc') + ';border:2px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;font-size:13px;font-weight:700;color:var(--dk)">' + pct + '%</div>' +
+      '<div style="font-size:10px;font-weight:600;color:var(--dk)">' + k + '</div>' +
+      '<div style="font-size:9px;color:var(--sv)">' + d.qty + ' ш</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('shadePie').innerHTML = pieHtml;
 }
 
 async function loadRecentOrders() {

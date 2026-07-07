@@ -27,6 +27,25 @@ router.get('/stats', requireAuth, async (req, res) => {
     if (day in daily) daily[day] += o.amount;
   });
 
+  const monthly = {};
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    monthly[d.toISOString().slice(0, 10)] = 0;
+  }
+  paid.forEach(o => {
+    const day = (o.created_at || '').slice(0, 10);
+    if (day in monthly) monthly[day] += o.amount;
+  });
+
+  const shades = {};
+  orders.forEach(o => {
+    const s = o.shade || '—';
+    if (!shades[s]) shades[s] = { orders: 0, qty: 0 };
+    shades[s].orders++;
+    shades[s].qty += Number(o.quantity) || 1;
+  });
+
   res.json({
     total:     orders.length,
     paid:      paid.length,
@@ -35,6 +54,8 @@ router.get('/stats', requireAuth, async (req, res) => {
     shipped:   orders.filter(o => o.status === 'shipped').length,
     delivered: orders.filter(o => o.status === 'delivered').length,
     daily,
+    monthly,
+    shades,
   });
 });
 
