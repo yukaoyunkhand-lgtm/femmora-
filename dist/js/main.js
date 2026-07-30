@@ -18,16 +18,88 @@ function setLang(l){
   });
 }
 
+// ---- Хямдрал тохиргоо ----
+var SALE_START=new Date('2026-08-01T00:00:00+08:00');
+var SALE_END=new Date('2026-09-01T00:00:00+08:00');
+var SALE_PCT=15;
+var BASE_PRICE=61900, DELIVERY_FEE=7000;
+var _saleActive=false;
+
+function isSaleActive(){
+  var now=new Date();
+  return now>=SALE_START&&now<SALE_END;
+}
+
+function getUnitPrice(){
+  return _saleActive?Math.round(BASE_PRICE*(1-SALE_PCT/100)):BASE_PRICE;
+}
+
+function initSale(){
+  _saleActive=isSaleActive();
+  if(!_saleActive){document.body.classList.remove('sale-on');return;}
+  document.body.classList.add('sale-on');
+  var banner=document.getElementById('saleBanner');
+  if(banner)banner.style.display='flex';
+  var priceEl=document.getElementById('priceDisplay');
+  var salePrice=getUnitPrice()+DELIVERY_FEE;
+  if(priceEl)priceEl.textContent=salePrice.toLocaleString()+'₮';
+  var oldEl=document.getElementById('priceOld');
+  if(oldEl){oldEl.style.display='block';oldEl.textContent=(BASE_PRICE+DELIVERY_FEE).toLocaleString()+'₮';}
+  var badge=document.getElementById('saleBadge');
+  if(badge)badge.style.display='inline-block';
+  var saleRow=document.getElementById('modalSaleRow');
+  if(saleRow)saleRow.style.display='flex';
+  updateSaleCountdown();
+  setInterval(updateSaleCountdown,1000);
+  showSplash();
+}
+
+function showSplash(){
+  var shown=sessionStorage.getItem('sale_splash_seen');
+  if(shown)return;
+  var el=document.getElementById('saleSplash');
+  if(!el)return;
+  el.style.display='flex';
+  setTimeout(function(){closeSplash();},3000);
+}
+
+function closeSplash(){
+  var el=document.getElementById('saleSplash');
+  if(!el||el.style.display==='none')return;
+  el.classList.add('fade-out');
+  sessionStorage.setItem('sale_splash_seen','1');
+  setTimeout(function(){el.style.display='none';el.classList.remove('fade-out');},400);
+}
+
+function updateSaleCountdown(){
+  var now=new Date();
+  var diff=SALE_END-now;
+  if(diff<=0){location.reload();return;}
+  var d=Math.floor(diff/86400000);
+  var h=Math.floor((diff%86400000)/3600000);
+  var m=Math.floor((diff%3600000)/60000);
+  var s=Math.floor((diff%60000)/1000);
+  var el=document.getElementById('saleCountdown');
+  if(el)el.innerHTML=
+    '<span class="cd-block">'+d+' өдөр</span><span class="cd-sep">:</span>'+
+    '<span class="cd-block">'+('0'+h).slice(-2)+'</span><span class="cd-sep">:</span>'+
+    '<span class="cd-block">'+('0'+m).slice(-2)+'</span><span class="cd-sep">:</span>'+
+    '<span class="cd-block">'+('0'+s).slice(-2)+'</span>';
+}
+
 // ---- Modal үнэ ----
-var UNIT_PRICE=61900, DELIVERY_FEE=7000;
 function updateModalPrice(){
+  var price=getUnitPrice();
   var qty=Math.max(1,Number(document.getElementById('o_qty').value)||1);
-  var productTotal=UNIT_PRICE*qty;
-  var grandTotal=productTotal+DELIVERY_FEE;
+  var productTotal=BASE_PRICE*qty;
+  var discountTotal=Math.round(BASE_PRICE*qty*SALE_PCT/100);
+  var grandTotal=(_saleActive?productTotal-discountTotal:productTotal)+DELIVERY_FEE;
   var qtyEl=document.getElementById('modalQtyLabel');
   if(qtyEl) qtyEl.textContent=qty>1?'(×'+qty+')':'';
   var ppEl=document.getElementById('modalProductPrice');
   if(ppEl) ppEl.textContent=productTotal.toLocaleString()+'₮';
+  var discEl=document.getElementById('modalDiscountAmt');
+  if(discEl&&_saleActive) discEl.textContent='−'+discountTotal.toLocaleString()+'₮';
   var totEl=document.getElementById('modalPriceTotal');
   if(totEl) totEl.textContent=grandTotal.toLocaleString()+'₮';
 }
@@ -518,6 +590,7 @@ document.addEventListener('DOMContentLoaded',function(){
   setLang('mn');
   loadReviews();
   _setupLeadCapture();
+  initSale();
 });
 
 // ---- Lead capture: маягтад имэйл бичингүүт хадгална ----

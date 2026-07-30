@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2">
+<link rel="stylesheet" href="css/style.css?v=20260730">
 
 <script type="application/ld+json">
 {
@@ -108,6 +108,19 @@
 </script>
 </head>
 <body>
+
+<!-- SALE BANNER: 2026-08-01 ~ 2026-08-31 -->
+<div class="sale-banner" id="saleBanner" style="display:none">
+  <span class="sale-pct t" data-mn="15% ХЯМДРАЛ" data-ko="15% 할인" data-en="15% OFF">15% ХЯМДРАЛ</span>
+  <span class="t" data-mn="8-р сарын 31 хүртэл" data-ko="8월 31일까지" data-en="Until Aug 31">8-р сарын 31 хүртэл</span>
+  <div class="sale-countdown" id="saleCountdown"></div>
+</div>
+
+<!-- SALE SPLASH POPUP -->
+<div class="sale-splash" id="saleSplash" style="display:none" onclick="closeSplash()">
+  <img src="images/sale-popup.jpg" alt="Femmora 15% хямдрал — 8-р сарын дуустал">
+  <button class="splash-close" onclick="closeSplash()" aria-label="Хаах">✕</button>
+</div>
 
 <div class="lb-bar">
   <button class="lb active" id="bn" onclick="setLang('mn')">MN</button>
@@ -218,6 +231,8 @@
     <div class="price-col">
       <p class="price-label t" data-mn="Үнэ" data-ko="가격" data-en="Price">Үнэ</p>
       <p class="price-amount" id="priceDisplay">68,900₮</p>
+      <p class="sale-price-old" id="priceOld" style="display:none">68,900₮</p>
+      <span class="sale-badge" id="saleBadge" style="display:none">-15%</span>
       <p class="price-note t" data-mn="Үнэ · Хүргэлт +7,000₮" data-ko="가격 · 배송비 +7,000₮" data-en="Price · Delivery +7,000₮">Үнэ · Хүргэлт +7,000₮</p>
     </div>
     <div class="price-divider"></div>
@@ -869,6 +884,10 @@
           <span style="color:#6b5f5a">Бүтээгдэхүүний НӨАТ-гүй үнэ <span id="modalQtyLabel"></span></span>
           <span id="modalProductPrice" style="color:#2a2420;font-weight:500">61,900₮</span>
         </div>
+        <div id="modalSaleRow" style="display:none;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+          <span style="color:#c0392b">🏷️ 15% хямдрал</span>
+          <span id="modalDiscountAmt" style="color:#c0392b;font-weight:500">−9,285₮</span>
+        </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
           <span style="color:#6b5f5a">🚚 Хүргэлтийн хөлс</span>
           <span style="color:#2a2420;font-weight:500">7,000₮</span>
@@ -985,7 +1004,7 @@ nav{position:relative}
 .success-title{font-size:16px;font-weight:500;color:#2a2420;letter-spacing:.3px}
 </style>
 
-<script src="js/main.js?v=20260507"></script>
+<script src="js/main.js?v=20260730"></script>
 
 <!-- Firebase Auth + Analytics -->
 <script type="module">

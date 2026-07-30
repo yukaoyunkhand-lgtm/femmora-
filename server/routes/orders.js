@@ -4,9 +4,19 @@ const db = require('../db');
 const { createInvoice } = require('./qpay');
 const { sendOrderNotification } = require('../mailer');
 
-const PRICE_PER_UNIT = 61900;  // НӨАТ хассан нэгж үнэ
+const BASE_PRICE    = 61900;   // НӨАТ хассан нэгж үнэ
 const DELIVERY_FEE  = 7000;   // Хүргэлтийн хөлс (тогтмол)
+const SALE_START    = new Date('2026-08-01T00:00:00+08:00');
+const SALE_END      = new Date('2026-09-01T00:00:00+08:00');
+const SALE_PCT      = 15;
 const COL = 'orders';
+
+function getUnitPrice() {
+  const now = new Date();
+  return now >= SALE_START && now < SALE_END
+    ? Math.round(BASE_PRICE * (1 - SALE_PCT / 100))
+    : BASE_PRICE;
+}
 
 function genOrderNo() {
   const d = new Date();
@@ -25,7 +35,8 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Утасны дугаар 8 оронтой байх ёстой' });
 
   const qty    = Math.max(1, Math.min(10, Number(quantity)));
-  const amount = PRICE_PER_UNIT * qty + DELIVERY_FEE;
+  const unitPrice = getUnitPrice();
+  const amount = unitPrice * qty + DELIVERY_FEE;
   const order_no = genOrderNo();
 
   const order = {
