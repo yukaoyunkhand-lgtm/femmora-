@@ -41,10 +41,10 @@ function initSale(){
   var banner=document.getElementById('saleBanner');
   if(banner)banner.style.display='flex';
   var priceEl=document.getElementById('priceDisplay');
-  var salePrice=getUnitPrice()+DELIVERY_FEE;
+  var salePrice=getUnitPrice();
   if(priceEl)priceEl.textContent=salePrice.toLocaleString()+'₮';
   var oldEl=document.getElementById('priceOld');
-  if(oldEl){oldEl.style.display='block';oldEl.textContent=(BASE_PRICE+DELIVERY_FEE).toLocaleString()+'₮';}
+  if(oldEl){oldEl.style.display='block';oldEl.textContent=BASE_PRICE.toLocaleString()+'₮';}
   var badge=document.getElementById('saleBadge');
   if(badge)badge.style.display='inline-block';
   var saleRow=document.getElementById('modalSaleRow');
