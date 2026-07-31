@@ -60,7 +60,7 @@ function showSplash(){
   var el=document.getElementById('saleSplash');
   if(!el)return;
   el.style.display='flex';
-  setTimeout(function(){closeSplash();},3000);
+  setTimeout(function(){closeSplash();},6000);
 }
 
 function closeSplash(){
