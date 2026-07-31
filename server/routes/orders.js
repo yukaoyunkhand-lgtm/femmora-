@@ -47,7 +47,7 @@ router.post('/', async (req, res) => {
     quantity: qty,
     shade: shade || null,
     email: (email || '').trim() || null,
-    unit_price:   PRICE_PER_UNIT,
+    unit_price:   unitPrice,
     delivery_fee: DELIVERY_FEE,
     amount,
     status: 'pending',
