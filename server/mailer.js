@@ -20,31 +20,40 @@ async function sendViaResend({ from, to, subject, html }) {
 }
 
 async function sendOrderNotification(order) {
-  const transport = getTransport();
-  if (!transport) return;
   const to = process.env.NOTIFY_EMAIL || process.env.SMTP_USER;
-  await transport.sendMail({
-    from: `"Femmora" <${process.env.SMTP_USER}>`,
-    to,
-    subject: `Шинэ захиалга — ${order.order_no}`,
-    html: `
-      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
-        <h2 style="font-size:18px;font-weight:600;margin-bottom:16px">🛍 Шинэ захиалга ирлээ</h2>
-        <table style="width:100%;border-collapse:collapse;font-size:13px">
-          <tr><td style="padding:6px 0;color:#666">Захиалга №</td><td style="padding:6px 0;font-weight:600">${order.order_no}</td></tr>
-          <tr><td style="padding:6px 0;color:#666">Нэр</td><td style="padding:6px 0">${order.name}</td></tr>
-          <tr><td style="padding:6px 0;color:#666">Утас</td><td style="padding:6px 0">${order.phone}</td></tr>
-          <tr><td style="padding:6px 0;color:#666">Хаяг</td><td style="padding:6px 0">${order.address}</td></tr>
-          <tr><td style="padding:6px 0;color:#666">Тоо ширхэг</td><td style="padding:6px 0">${order.quantity}</td></tr>
-          <tr><td style="padding:6px 0;color:#666">Дүн</td><td style="padding:6px 0;font-weight:600">${order.amount.toLocaleString()}₮</td></tr>
-          <tr><td style="padding:6px 0;color:#666">НӨЭТ</td><td style="padding:6px 0">${order.include_vat ? 'Тийм' : 'Үгүй'}</td></tr>
-        </table>
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999">
-          ${new Date().toLocaleString('mn-MN')}
-        </div>
+  if (!to) return;
+  const subject = `Шинэ захиалга — ${order.order_no}`;
+  const html = `
+    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+      <h2 style="font-size:18px;font-weight:600;margin-bottom:16px">🛍 Шинэ захиалга ирлээ</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <tr><td style="padding:6px 0;color:#666">Захиалга №</td><td style="padding:6px 0;font-weight:600">${order.order_no}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Нэр</td><td style="padding:6px 0">${order.name}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Утас</td><td style="padding:6px 0">${order.phone}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Хаяг</td><td style="padding:6px 0">${order.address}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Өнгө</td><td style="padding:6px 0">${order.shade || '—'}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Тоо ширхэг</td><td style="padding:6px 0">${order.quantity}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Нэгж үнэ</td><td style="padding:6px 0">${(order.unit_price || 0).toLocaleString()}₮</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Хүргэлт</td><td style="padding:6px 0">${(order.delivery_fee || 0).toLocaleString()}₮</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Нийт дүн</td><td style="padding:6px 0;font-weight:600;font-size:15px">${order.amount.toLocaleString()}₮</td></tr>
+      </table>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999">
+        ${new Date().toLocaleString('mn-MN')}
       </div>
-    `,
-  });
+    </div>
+  `;
+  const fromAddr = '"Femmora Beauty" <info@femmorabeauty.mn>';
+  try {
+    if (process.env.RESEND_API_KEY) {
+      await sendViaResend({ from: fromAddr, to, subject, html });
+    } else {
+      const transport = getTransport();
+      if (!transport) return;
+      await transport.sendMail({ from: `"Femmora" <${process.env.SMTP_USER}>`, to, subject, html });
+    }
+  } catch (e) {
+    console.error('[mailer] sendOrderNotification error:', e.message);
+  }
 }
 
 async function sendB2BNotification(inquiry) {
