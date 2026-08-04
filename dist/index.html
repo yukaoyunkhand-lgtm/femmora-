@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20260802c">
+<link rel="stylesheet" href="css/style.css?v=20260804a">
 
 <script type="application/ld+json">
 {
@@ -129,7 +129,9 @@
 </div>
 <nav>
   <img class="logo" src="images/img_01.png" alt="femmora">
-  <ul class="nl">
+  <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+  <ul class="nl" id="navLinks">
+    <button class="mob-close" onclick="toggleMobileMenu()">✕</button>
     <li><a href="#ab"><span class="t" data-mn="Бидний тухай" data-ko="브랜드" data-en="About">Бидний тухай</span></a></li>
     <li><a href="#pr"><span class="t" data-mn="Бүтээгдэхүүн" data-ko="제품" data-en="Product">Бүтээгдэхүүн</span></a></li>
     <li><a href="#sf"><span class="t" data-mn="Өнгө тодорхойлогч" data-ko="컬러 추천" data-en="Shade Finder">Өнгө тодорхойлогч</span></a></li>
@@ -137,6 +139,7 @@
     <li><a href="#terms"><span class="t" data-mn="Нөхцөл" data-ko="이용약관" data-en="Terms">Нөхцөл</span></a></li>
     <li><a href="#locations"><span class="t" data-mn="Байршил" data-ko="매장" data-en="Locations">Байршил</span></a></li>
     <li><a href="#buy"><span class="t" data-mn="Худалдан авах" data-ko="구매" data-en="Shop">Худалдан авах</span></a></li>
+    <li class="mob-lang"><button class="lb active" id="mbn" onclick="setLang('mn')">MN</button><button class="lb" id="mbk" onclick="setLang('ko')">KO</button><button class="lb" id="mbe" onclick="setLang('en')">EN</button></li>
   </ul>
   <div class="nr">
     <span class="ni">♡</span>
@@ -1005,7 +1008,7 @@ nav{position:relative}
 .success-title{font-size:16px;font-weight:500;color:#2a2420;letter-spacing:.3px}
 </style>
 
-<script src="js/main.js?v=20260730"></script>
+<script src="js/main.js?v=20260804a"></script>
 
 <!-- Firebase Auth + Analytics -->
 <script type="module">

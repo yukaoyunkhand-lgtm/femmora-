@@ -12,11 +12,33 @@ function setLang(l){
   var btnId=l==='ko'?'bk':l==='mn'?'bn':'be';
   var btn=document.getElementById(btnId);
   if(btn) btn.classList.add('active');
+  var mbtnId=l==='ko'?'mbk':l==='mn'?'mbn':'mbe';
+  var mbtn=document.getElementById(mbtnId);
+  if(mbtn) mbtn.classList.add('active');
   document.querySelectorAll('.t').forEach(function(el){
     var v=el.getAttribute('data-'+l);
     if(v) el.innerHTML=v;
   });
 }
+
+function toggleMobileMenu(){
+  var nav=document.getElementById('navLinks');
+  if(nav.classList.contains('open')){
+    nav.classList.remove('open');
+    document.body.style.overflow='';
+  } else {
+    nav.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('#navLinks a').forEach(function(a){
+    a.addEventListener('click',function(){
+      var nav=document.getElementById('navLinks');
+      if(nav.classList.contains('open')){nav.classList.remove('open');document.body.style.overflow='';}
+    });
+  });
+});
 
 // ---- Хямдрал тохиргоо ----
 var SALE_START=new Date('2026-08-01T00:00:00+08:00');
