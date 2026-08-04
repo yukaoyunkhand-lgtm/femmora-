@@ -38,6 +38,23 @@ router.get('/stats', requireAuth, async (req, res) => {
     if (day in monthly) monthly[day] += o.amount;
   });
 
+  // By-month aggregation from 2026-05 onwards
+  const byMonth = {};
+  const startMonth = '2026-05';
+  const now = new Date();
+  const endMonth = now.toISOString().slice(0, 7);
+  let cur = startMonth;
+  while (cur <= endMonth) {
+    byMonth[cur] = 0;
+    const [y, m] = cur.split('-').map(Number);
+    const next = m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, '0')}`;
+    cur = next;
+  }
+  paid.forEach(o => {
+    const mo = (o.created_at || '').slice(0, 7);
+    if (mo in byMonth) byMonth[mo] += o.amount;
+  });
+
   const shades = {};
   orders.forEach(o => {
     const s = o.shade || '—';
@@ -55,6 +72,7 @@ router.get('/stats', requireAuth, async (req, res) => {
     delivered: orders.filter(o => o.status === 'delivered').length,
     daily,
     monthly,
+    byMonth,
     shades,
   });
 });

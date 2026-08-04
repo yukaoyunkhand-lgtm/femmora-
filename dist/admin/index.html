@@ -355,6 +355,7 @@ td .address{font-size:10px;color:var(--sv);margin-top:2px;max-width:180px;
             <div style="display:flex;gap:0">
               <button class="filter-btn active" id="btn7" onclick="switchChart('7')" style="padding:4px 12px;font-size:8px">7 хоног</button>
               <button class="filter-btn" id="btn30" onclick="switchChart('30')" style="padding:4px 12px;font-size:8px;border-left:none">Сарын</button>
+              <button class="filter-btn" id="btnMonth" onclick="switchChart('byMonth')" style="padding:4px 12px;font-size:8px;border-left:none">Сар бүр</button>
             </div>
           </div>
           <div class="chart-bars" id="chartBars"></div>
@@ -994,26 +995,37 @@ function switchChart(mode) {
   if (!_statsCache) return;
   var btn7 = document.getElementById('btn7');
   var btn30 = document.getElementById('btn30');
+  var btnMonth = document.getElementById('btnMonth');
   var title = document.getElementById('chartTitle');
+  btn7.classList.remove('active'); btn30.classList.remove('active'); btnMonth.classList.remove('active');
   if (mode === '7') {
-    btn7.classList.add('active'); btn30.classList.remove('active');
+    btn7.classList.add('active');
     title.textContent = '7 хоногийн орлого (₮)';
     drawChart(_statsCache.daily);
-  } else {
-    btn30.classList.add('active'); btn7.classList.remove('active');
+  } else if (mode === '30') {
+    btn30.classList.add('active');
     title.textContent = 'Сарын орлого (₮)';
     drawChart(_statsCache.monthly);
+  } else {
+    btnMonth.classList.add('active');
+    title.textContent = 'Сар бүрийн орлого (₮)';
+    drawChart(_statsCache.byMonth, true);
   }
 }
 
-function drawChart(daily) {
+function drawChart(daily, isMonthly) {
   var entries = Object.entries(daily);
   var max = Math.max(...entries.map(e => e[1]), 1);
   var showEvery = entries.length > 10 ? Math.ceil(entries.length / 10) : 1;
   var html = entries.map(function([day, val], i) {
     var pct = Math.max((val / max) * 100, val > 0 ? 4 : 1);
-    var label = (i % showEvery === 0 || i === entries.length - 1) ? day.slice(5) : '';
-    var dispVal = val > 0 ? (val/1000).toFixed(0) + 'k' : '';
+    var label;
+    if (isMonthly) {
+      label = parseInt(day.slice(5)) + '-сар';
+    } else {
+      label = (i % showEvery === 0 || i === entries.length - 1) ? day.slice(5) : '';
+    }
+    var dispVal = val > 0 ? (val >= 1000000 ? (val/1000000).toFixed(1) + 'M' : (val/1000).toFixed(0) + 'k') : '';
     return '<div class="chart-bar-wrap"><div class="chart-bar-val">' + dispVal +
       '</div><div class="chart-bar" style="height:' + pct + '%"></div>' +
       '<div class="chart-bar-label">' + label + '</div></div>';
