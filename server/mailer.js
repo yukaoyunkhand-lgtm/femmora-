@@ -20,8 +20,9 @@ async function sendViaResend({ from, to, subject, html }) {
 }
 
 async function sendOrderNotification(order) {
-  const to = process.env.NOTIFY_EMAIL || process.env.SMTP_USER;
-  if (!to) return;
+  const raw = process.env.NOTIFY_EMAIL || process.env.SMTP_USER;
+  if (!raw) return;
+  const to = raw.includes(',') ? raw.split(',').map(e => e.trim()) : raw;
   const subject = `Шинэ захиалга — ${order.order_no}`;
   const html = `
     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
