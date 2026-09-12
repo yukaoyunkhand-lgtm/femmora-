@@ -9,10 +9,10 @@ function setLang(l){
   currentLang=l;
   if(typeof window._logLang==='function') window._logLang(l);
   document.querySelectorAll('.lb').forEach(function(b){b.classList.remove('active');});
-  var btnId=l==='ko'?'bk':l==='mn'?'bn':l==='ja'?'bj':l==='ru'?'br':'be';
+  var btnId=l==='ko'?'bk':l==='mn'?'bn':l==='ja'?'bj':l==='ru'?'br':l==='kk'?'bkk':'be';
   var btn=document.getElementById(btnId);
   if(btn) btn.classList.add('active');
-  var mbtnId=l==='ko'?'mbk':l==='mn'?'mbn':l==='ja'?'mbj':l==='ru'?'mbr':'mbe';
+  var mbtnId=l==='ko'?'mbk':l==='mn'?'mbn':l==='ja'?'mbj':l==='ru'?'mbr':l==='kk'?'mbkk':'mbe';
   var mbtn=document.getElementById(mbtnId);
   if(mbtn) mbtn.classList.add('active');
   document.querySelectorAll('.t').forEach(function(el){
