@@ -9,10 +9,10 @@ function setLang(l){
   currentLang=l;
   if(typeof window._logLang==='function') window._logLang(l);
   document.querySelectorAll('.lb').forEach(function(b){b.classList.remove('active');});
-  var btnId=l==='ko'?'bk':l==='mn'?'bn':'be';
+  var btnId=l==='ko'?'bk':l==='mn'?'bn':l==='ja'?'bj':l==='ru'?'br':'be';
   var btn=document.getElementById(btnId);
   if(btn) btn.classList.add('active');
-  var mbtnId=l==='ko'?'mbk':l==='mn'?'mbn':'mbe';
+  var mbtnId=l==='ko'?'mbk':l==='mn'?'mbn':l==='ja'?'mbj':l==='ru'?'mbr':'mbe';
   var mbtn=document.getElementById(mbtnId);
   if(mbtn) mbtn.classList.add('active');
   document.querySelectorAll('.t').forEach(function(el){
@@ -410,7 +410,7 @@ async function loadReviews(){
     var good=list.filter(function(rv){ return rv.rating>=4; });
     var container=document.getElementById('reviewsList');
     if(!good.length){
-      container.innerHTML='<div style="text-align:center;color:var(--md);font-size:12px;padding:2rem;grid-column:1/-1" class="t" data-mn="Одоогоор сэтгэгдэл байхгүй. Анхны сэтгэгдэлээ үлдээгээрэй!" data-ko="아직 리뷰가 없습니다. 첫 번째 리뷰를 남겨주세요!" data-en="No reviews yet. Be the first to leave one!">Одоогоор сэтгэгдэл байхгүй. Анхны сэтгэгдэлээ үлдээгээрэй!</div>';
+      container.innerHTML='<div style="text-align:center;color:var(--md);font-size:12px;padding:2rem;grid-column:1/-1" class="t" data-mn="Одоогоор сэтгэгдэл байхгүй. Анхны сэтгэгдэлээ үлдээгээрэй!" data-ko="아직 리뷰가 없습니다. 첫 번째 리뷰를 남겨주세요!" data-en="No reviews yet. Be the first to leave one!" data-ja="まだレビューがありません。最初のレビューを投稿してください！" data-ru="Отзывов пока нет. Будьте первым!">Одоогоор сэтгэгдэл байхгүй. Анхны сэтгэгдэлээ үлдээгээрэй!</div>';
       return;
     }
     container.innerHTML=good.map(function(rv){
